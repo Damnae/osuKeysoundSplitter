@@ -20,14 +20,12 @@ public class KeysoundExtractor implements PCMProcessor {
 	private long pcmPosition;
 
 	private ByteArrayOutputStream bos;
-	private long offset;
 
 	public KeysoundExtractor(List<Keysound> keysounds,
 			KeysoundWriter keysoundWriter) {
 
 		this.keysoundWriter = keysoundWriter;
 		this.keysounds = keysounds;
-		offset = 0;
 	}
 
 	public void complete() throws IOException {
@@ -45,24 +43,37 @@ public class KeysoundExtractor implements PCMProcessor {
 				* info.getChannels());
 
 		this.info = info;
-
 		bos = new ByteArrayOutputStream(info.getSampleRate()
 				* (info.getBitsPerSample() / 8) * info.getChannels());
 	}
 
 	@Override
 	public void processPCM(ByteData pcm) {
-		long sampleTime = (pcmPosition * 1000)
-				/ (info.getSampleRate() * (info.getBitsPerSample() / 8) * info
-						.getChannels());
+		long bytePerSecond = (info.getSampleRate()
+				* (info.getBitsPerSample() / 8) * info.getChannels());
+
+		double startTime = (pcmPosition * 1000.0) / bytePerSecond;
+		double endTime = ((pcmPosition + pcm.getLen()) * 1000.0)
+				/ bytePerSecond;
+		double duration = (pcm.getLen() * 1000.0) / bytePerSecond;
+
+		int samples = pcm.getLen()
+				/ ((info.getBitsPerSample() / 8) * info.getChannels());
+		int consumedSamples = 0;
 
 		// Check to move to the next keysound
 		if (keysoundIndex < keysounds.size() - 1) {
 			Keysound nextKeysound = keysounds.get(keysoundIndex + 1);
 
-			if (nextKeysound.startTime - offset <= sampleTime) {
+			if (nextKeysound.startTime <= endTime) {
 				++keysoundIndex;
 				try {
+					double timePercentage = (nextKeysound.startTime - startTime)
+							/ (double) duration;
+					consumedSamples = (int) (timePercentage * samples);
+
+					if (keysoundIndex > 0)
+						writePCM(pcm, 0, consumedSamples);
 					startKeysound();
 
 				} catch (IOException e) {
@@ -72,10 +83,10 @@ public class KeysoundExtractor implements PCMProcessor {
 		}
 
 		if (keysoundIndex > -1
-				&& sampleTime < keysounds.get(keysoundIndex).endTime - offset) {
+				&& startTime < keysounds.get(keysoundIndex).endTime) {
 
 			try {
-				writePCM(pcm);
+				writePCM(pcm, consumedSamples, samples - consumedSamples);
 
 			} catch (IOException e) {
 				throw new RuntimeException(e);
@@ -91,12 +102,23 @@ public class KeysoundExtractor implements PCMProcessor {
 			keysounds.get(keysoundIndex - 1).filename = keysoundWriter
 					.writeKeysound(String.valueOf(keysoundIndex - 1),
 							bos.toByteArray(), info);
-		}
 
-		bos.reset();
+			bos.reset();
+		}
 	}
 
-	private void writePCM(ByteData pcm) throws IOException {
-		bos.write(pcm.getData(), 0, pcm.getLen());
+	private void writePCM(ByteData pcm, int sampletOffset, int samples)
+			throws IOException {
+
+		int offset = sampletOffset * (info.getBitsPerSample() / 8)
+				* info.getChannels();
+		int length = samples * (info.getBitsPerSample() / 8)
+				* info.getChannels();
+
+		// System.out.println("writing samples from " + sampletOffset + " to "
+		// + (sampletOffset + samples) + ", bytes from " + offset + " to "
+		// + (offset + length) + " of " + pcm.getLen());
+
+		bos.write(pcm.getData(), offset, length);
 	}
 }
