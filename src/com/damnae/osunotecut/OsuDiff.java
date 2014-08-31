@@ -21,23 +21,28 @@ public class OsuDiff {
 
 	public OsuDiff(File file) throws IOException {
 		FileInputStream is = new FileInputStream(file);
-		InputStreamReader inputStreamReader = new InputStreamReader(is,
-				Charset.forName("UTF-8"));
-		BufferedReader reader = new BufferedReader(inputStreamReader);
+		try {
+			InputStreamReader inputStreamReader = new InputStreamReader(is,
+					Charset.forName("UTF-8"));
+			BufferedReader reader = new BufferedReader(inputStreamReader);
 
-		String line;
-		while ((line = reader.readLine()) != null) {
-			line = line.trim();
-			if (line.startsWith("[") && line.endsWith("]")) {
-				String sectionName = line.substring(1, line.length() - 1);
+			String line;
+			while ((line = reader.readLine()) != null) {
+				line = line.trim();
+				if (line.startsWith("[") && line.endsWith("]")) {
+					String sectionName = line.substring(1, line.length() - 1);
 
-				if (sectionName.equals("Editor")) {
-					parseOsuEditorSection(reader);
+					if (sectionName.equals("Editor")) {
+						parseOsuEditorSection(reader);
 
-				} else if (sectionName.equals("HitObjects")) {
-					parseOsuHitObjectsSection(reader);
+					} else if (sectionName.equals("HitObjects")) {
+						parseOsuHitObjectsSection(reader);
+					}
 				}
 			}
+
+		} finally {
+			is.close();
 		}
 	}
 

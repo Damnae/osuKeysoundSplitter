@@ -7,7 +7,7 @@ public class Main {
 
 	public static final String FOLDER_PATH = "C:/Games/osu!/Songs/egoizminstr/";
 	public static final String DIFF_FILE = "la la larks - ego-izm -Instrumental- (Damnae) [voice].osu";
-	public static final String KEYSOUNDS_FILE = "keysounds.flac";
+	public static final String KEYSOUNDS_FILE = "voice.flac";
 
 	public static void main(String[] args) throws IOException {
 		File diffFile = new File(FOLDER_PATH + DIFF_FILE);
