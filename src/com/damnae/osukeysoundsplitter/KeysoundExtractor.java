@@ -13,6 +13,7 @@ import com.damnae.osukeysoundsplitter.KeysoundProcessor.Keysound;
 public class KeysoundExtractor implements PCMProcessor {
 	private List<Keysound> keysounds;
 	private KeysoundWriter keysoundWriter;
+	private int offset;
 
 	private StreamInfo info;
 
@@ -22,10 +23,11 @@ public class KeysoundExtractor implements PCMProcessor {
 	private ByteArrayOutputStream bos;
 
 	public KeysoundExtractor(List<Keysound> keysounds,
-			KeysoundWriter keysoundWriter) {
+			KeysoundWriter keysoundWriter, int offset) {
 
 		this.keysoundWriter = keysoundWriter;
 		this.keysounds = keysounds;
+		this.offset = offset;
 	}
 
 	public void complete() throws IOException {
@@ -52,9 +54,9 @@ public class KeysoundExtractor implements PCMProcessor {
 		long bytePerSecond = (info.getSampleRate()
 				* (info.getBitsPerSample() / 8) * info.getChannels());
 
-		double startTime = (pcmPosition * 1000.0) / bytePerSecond;
+		double startTime = (pcmPosition * 1000.0) / bytePerSecond - offset;
 		double endTime = ((pcmPosition + pcm.getLen()) * 1000.0)
-				/ bytePerSecond;
+				/ bytePerSecond - offset;
 		double duration = (pcm.getLen() * 1000.0) / bytePerSecond;
 
 		int samples = pcm.getLen()

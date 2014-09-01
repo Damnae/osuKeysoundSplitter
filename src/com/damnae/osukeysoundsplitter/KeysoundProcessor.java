@@ -28,10 +28,12 @@ public class KeysoundProcessor {
 		public boolean isEvent;
 	}
 
-	public void process(File diffFile, File keysoundsFile) throws IOException {
+	public void process(File diffFile, File keysoundsFile, int offset)
+			throws IOException {
+
 		OsuDiff osuDiff = new OsuDiff(diffFile);
 		List<Keysound> keysounds = getKeysounds(osuDiff);
-		extractKeysounds(keysoundsFile, keysounds);
+		extractKeysounds(keysoundsFile, keysounds, offset);
 		insertKeysounds(diffFile, keysounds);
 	}
 
@@ -72,14 +74,14 @@ public class KeysoundProcessor {
 		return keysounds;
 	}
 
-	private void extractKeysounds(File keysoundsFile, List<Keysound> keysounds)
-			throws IOException {
+	private void extractKeysounds(File keysoundsFile, List<Keysound> keysounds,
+			int offset) throws IOException {
 
 		KeysoundWriter writer = new OggKeysoundWriter(keysoundsFile
 				.getParentFile().getCanonicalPath() + "/",
 				getKeysoundsFolderPath(keysoundsFile));
 		KeysoundExtractor keysoundExtractor = new KeysoundExtractor(keysounds,
-				writer);
+				writer, offset);
 
 		FileInputStream is = new FileInputStream(keysoundsFile);
 		FLACDecoder decoder = new FLACDecoder(is);
