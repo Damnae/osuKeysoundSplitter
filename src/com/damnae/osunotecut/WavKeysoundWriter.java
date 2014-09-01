@@ -21,7 +21,9 @@ public class WavKeysoundWriter extends BaseKeysoundWriter {
 		LittleEndianDataOutput dataOutputLE = new LittleEndianDataOutput(
 				dataOutput);
 
-		long totalSamples = streamInfo.getTotalSamples(); // XXX
+		long totalSamples = data.length
+				/ ((streamInfo.getBitsPerSample() / 8) * streamInfo
+						.getChannels());
 		int channels = streamInfo.getChannels();
 		int bps = streamInfo.getBitsPerSample();
 		int sampleRate = streamInfo.getSampleRate();
