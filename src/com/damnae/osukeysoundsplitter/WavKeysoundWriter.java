@@ -1,4 +1,4 @@
-package com.damnae.osunotecut;
+package com.damnae.osukeysoundsplitter;
 
 import java.io.DataOutput;
 import java.io.DataOutputStream;

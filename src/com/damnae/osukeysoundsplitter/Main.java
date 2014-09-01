@@ -1,4 +1,4 @@
-package com.damnae.osunotecut;
+package com.damnae.osukeysoundsplitter;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +13,7 @@ public class Main {
 		File diffFile = new File(FOLDER_PATH + DIFF_FILE);
 		File keysoundsFile = new File(FOLDER_PATH + KEYSOUNDS_FILE);
 
-		new OsuNoteCut().process(diffFile, keysoundsFile);
+		new KeysoundProcessor().process(diffFile, keysoundsFile);
+		System.out.println("Done");
 	}
 }

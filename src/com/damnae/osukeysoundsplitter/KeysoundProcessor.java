@@ -1,4 +1,4 @@
-package com.damnae.osunotecut;
+package com.damnae.osukeysoundsplitter;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -17,9 +17,9 @@ import java.util.List;
 
 import org.kc7bfi.jflac.FLACDecoder;
 
-import com.damnae.osunotecut.OsuDiff.AudioArea;
+import com.damnae.osukeysoundsplitter.OsuDiff.AudioArea;
 
-public class OsuNoteCut {
+public class KeysoundProcessor {
 
 	class Keysound {
 		public String filename;

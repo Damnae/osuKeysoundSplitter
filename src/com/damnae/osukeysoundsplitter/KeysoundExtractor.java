@@ -1,4 +1,4 @@
-package com.damnae.osunotecut;
+package com.damnae.osukeysoundsplitter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import org.kc7bfi.jflac.PCMProcessor;
 import org.kc7bfi.jflac.metadata.StreamInfo;
 import org.kc7bfi.jflac.util.ByteData;
 
-import com.damnae.osunotecut.OsuNoteCut.Keysound;
+import com.damnae.osukeysoundsplitter.KeysoundProcessor.Keysound;
 
 public class KeysoundExtractor implements PCMProcessor {
 	private List<Keysound> keysounds;
