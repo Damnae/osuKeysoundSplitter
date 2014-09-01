@@ -70,6 +70,14 @@ public class KeysoundExtractor implements PCMProcessor {
 				try {
 					double timePercentage = (nextKeysound.startTime - startTime)
 							/ (double) duration;
+					if (timePercentage < 0) {
+						// XXX why?
+
+						System.err.println("negative timePercentage "
+								+ timePercentage);
+						timePercentage = 0;
+					}
+
 					consumedSamples = (int) (timePercentage * samples);
 
 					if (keysoundIndex > 0)
@@ -115,10 +123,16 @@ public class KeysoundExtractor implements PCMProcessor {
 		int length = samples * (info.getBitsPerSample() / 8)
 				* info.getChannels();
 
-		// System.out.println("writing samples from " + sampletOffset + " to "
-		// + (sampletOffset + samples) + ", bytes from " + offset + " to "
-		// + (offset + length) + " of " + pcm.getLen());
+		try {
+			bos.write(pcm.getData(), offset, length);
 
-		bos.write(pcm.getData(), offset, length);
+		} catch (IndexOutOfBoundsException e) {
+			System.err.println("index out of bounds writing samples from "
+					+ sampletOffset + " to " + (sampletOffset + samples)
+					+ ", bytes from " + offset + " to " + (offset + length)
+					+ " of " + pcm.getLen());
+
+			throw e;
+		}
 	}
 }
