@@ -24,8 +24,18 @@ public class OggKeysoundWriter extends BaseKeysoundWriter {
 	protected void writeKeysound(FileOutputStream fos, byte[] data,
 			StreamInfo streamInfo) throws IOException {
 
-		int bytesPerSample = streamInfo.getBitsPerSample() / 8
-				* streamInfo.getChannels();
+		int bitsPerSample = streamInfo.getBitsPerSample();
+		int channels = streamInfo.getChannels();
+
+		if (bitsPerSample != 16)
+			throw new UnsupportedOperationException(
+					"expecting 16 bits per sample, got " + bitsPerSample);
+
+		if (channels != 2)
+			throw new UnsupportedOperationException(
+					"expecting 2 channels, got " + channels);
+
+		int bytesPerSample = bitsPerSample / 8 * channels;
 		byte[] readbuffer = new byte[SAMPLE_COUNT * bytesPerSample + 44];
 
 		vorbis_info vorbisInfo = new vorbis_info();
@@ -90,15 +100,8 @@ public class OggKeysoundWriter extends BaseKeysoundWriter {
 
 				int i = 0;
 				while (i < bytes / bytesPerSample) {
-					if (bytesPerSample == 4) {
-						buffer[0][dspState.pcm_current + i] = ((readbuffer[i * 4 + 1] << 8) | (0x00ff & (int) readbuffer[i * 4])) / 32768.f;
-						buffer[1][dspState.pcm_current + i] = ((readbuffer[i * 4 + 3] << 8) | (0x00ff & (int) readbuffer[i * 4 + 2])) / 32768.f;
-
-					} else {
-						throw new UnsupportedOperationException(
-								"expecting 16 bits per sample, got "
-										+ bytesPerSample);
-					}
+					buffer[0][dspState.pcm_current + i] = ((readbuffer[i * 4 + 1] << 8) | (0x00ff & (int) readbuffer[i * 4])) / 32768.f;
+					buffer[1][dspState.pcm_current + i] = ((readbuffer[i * 4 + 3] << 8) | (0x00ff & (int) readbuffer[i * 4 + 2])) / 32768.f;
 					++i;
 				}
 
