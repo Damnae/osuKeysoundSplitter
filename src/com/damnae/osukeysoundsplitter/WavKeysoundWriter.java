@@ -14,6 +14,7 @@ public class WavKeysoundWriter extends BaseKeysoundWriter {
 		super(mapFolderPath, keysoundFolderPath);
 	}
 
+	@Override
 	protected void writeKeysound(FileOutputStream os, byte[] data,
 			StreamInfo streamInfo) throws IOException {
 
@@ -28,18 +29,13 @@ public class WavKeysoundWriter extends BaseKeysoundWriter {
 		long dataSize = totalSamples * (bps / 8) * channels;
 
 		dataOutput.write("RIFF".getBytes());
-		// filesize-8
 		dataOutputLE.writeInt((int) dataSize + 36);
 		dataOutput.write("WAVEfmt ".getBytes());
-		// chunk size = 16
 		dataOutput.write(new byte[] { 0x10, 0x00, 0x00, 0x00 });
-		// compression code == 1
 		dataOutput.write(new byte[] { 0x01, 0x00 });
 		dataOutputLE.writeShort(channels);
 		dataOutputLE.writeInt(sampleRate);
-		// Average bytes per second
 		dataOutputLE.writeInt(sampleRate * (bps / 8) * channels);
-		// block align
 		dataOutputLE.writeShort((bps / 8) * channels);
 		dataOutputLE.writeShort(bps);
 		dataOutput.write("data".getBytes());

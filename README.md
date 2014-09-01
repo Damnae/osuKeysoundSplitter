@@ -3,7 +3,7 @@ osuKeysoundSplitter
 
 ## How to
 
-* [Generate a voice-only 16bit flac from a song and its intrumental version.](http://www.howtogeek.com/61250/how-to-isolate-and-save-vocals-from-music-tracks-using-audacity/)
+* [Generate a voice-only 16bit flac from a song and its instrumental version.](http://www.howtogeek.com/61250/how-to-isolate-and-save-vocals-from-music-tracks-using-audacity/)
 * Also export both the synchronized instrumental and complete song separately (@192kb/s).
 * Import the instrumental in osu! and time it.
 * Add the voice flac inside the map's folder.
@@ -24,7 +24,7 @@ public static final String DIFF_FILE = "SNoW - NightmaRe (Damnae) [NM].osu";
 ## FAQTS
 
  * Yes, it works with any audio track, it doesn't have to be voice.
- * No, it doesn't seperate different instruments from a complete song for you.
+ * No, it doesn't separate different instruments from a complete song for you.
  * No, there's no user interface and no .jar yet. You have to compile it and run it.
  * No, it's only for .osu files, so no .bme.
  * No, it doesn't work with sliders yet; osu! doesn't support the way I insert hitsounds in an .osu when it's a slider.

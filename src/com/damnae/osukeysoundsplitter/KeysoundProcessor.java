@@ -20,7 +20,7 @@ import org.kc7bfi.jflac.FLACDecoder;
 import com.damnae.osukeysoundsplitter.OsuDiff.AudioArea;
 
 public class KeysoundProcessor {
-	private static final long SHORT_AUDIO_AREA_THREASHOLD = 10; // ms
+	private static final long SHORT_AUDIO_AREA_THRESHOLD = 10; // ms
 
 	class Keysound {
 		public String filename;
@@ -47,7 +47,7 @@ public class KeysoundProcessor {
 			if (audioArea.noteTimes.isEmpty()) {
 				long areaDuration = audioArea.endTime - audioArea.startTime;
 
-				if (areaDuration > SHORT_AUDIO_AREA_THREASHOLD) {
+				if (areaDuration > SHORT_AUDIO_AREA_THRESHOLD) {
 					Keysound keysound = new Keysound();
 					keysound.startTime = audioArea.startTime;
 					keysound.endTime = audioArea.endTime;
@@ -59,7 +59,7 @@ public class KeysoundProcessor {
 				long areaDuration = audioArea.noteTimes.get(0)
 						- audioArea.startTime;
 
-				if (areaDuration > SHORT_AUDIO_AREA_THREASHOLD) {
+				if (areaDuration > SHORT_AUDIO_AREA_THRESHOLD) {
 					Keysound keysound = new Keysound();
 					keysound.startTime = audioArea.startTime;
 					keysound.endTime = audioArea.noteTimes.get(0);

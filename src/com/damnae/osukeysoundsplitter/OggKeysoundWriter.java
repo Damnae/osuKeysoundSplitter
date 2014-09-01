@@ -21,6 +21,7 @@ public class OggKeysoundWriter extends BaseKeysoundWriter {
 		super(mapFolderPath, keysoundFolderPath);
 	}
 
+	@Override
 	protected void writeKeysound(FileOutputStream fos, byte[] data,
 			StreamInfo streamInfo) throws IOException {
 
@@ -100,8 +101,8 @@ public class OggKeysoundWriter extends BaseKeysoundWriter {
 
 				int i = 0;
 				while (i < bytes / bytesPerSample) {
-					buffer[0][dspState.pcm_current + i] = ((readbuffer[i * 4 + 1] << 8) | (0x00ff & (int) readbuffer[i * 4])) / 32768.f;
-					buffer[1][dspState.pcm_current + i] = ((readbuffer[i * 4 + 3] << 8) | (0x00ff & (int) readbuffer[i * 4 + 2])) / 32768.f;
+					buffer[0][dspState.pcm_current + i] = ((readbuffer[i * 4 + 1] << 8) | (0x00ff & readbuffer[i * 4])) / 32768.f;
+					buffer[1][dspState.pcm_current + i] = ((readbuffer[i * 4 + 3] << 8) | (0x00ff & readbuffer[i * 4 + 2])) / 32768.f;
 					++i;
 				}
 
