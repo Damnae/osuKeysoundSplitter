@@ -21,14 +21,12 @@ public class WavKeysoundWriter extends BaseKeysoundWriter {
 		LittleEndianDataOutput dataOutputLE = new LittleEndianDataOutput(
 				dataOutput);
 
-		long totalSamples = data.length
-				/ ((streamInfo.getBitsPerSample() / 8) * streamInfo
-						.getChannels());
 		int channels = streamInfo.getChannels();
 		int bps = streamInfo.getBitsPerSample();
 		int sampleRate = streamInfo.getSampleRate();
+		long totalSamples = data.length / ((bps / 8) * channels);
+		long dataSize = totalSamples * (bps / 8) * channels;
 
-		long dataSize = totalSamples * channels * ((bps + 7) / 8);
 		dataOutput.write("RIFF".getBytes());
 		// filesize-8
 		dataOutputLE.writeInt((int) dataSize + 36);
@@ -39,10 +37,10 @@ public class WavKeysoundWriter extends BaseKeysoundWriter {
 		dataOutput.write(new byte[] { 0x01, 0x00 });
 		dataOutputLE.writeShort(channels);
 		dataOutputLE.writeInt(sampleRate);
-		// or is it (sample_rate*channels*bps) / 8
-		dataOutputLE.writeInt(sampleRate * channels * ((bps + 7) / 8));
+		// Average bytes per second
+		dataOutputLE.writeInt(sampleRate * (bps / 8) * channels);
 		// block align
-		dataOutputLE.writeShort(channels * ((bps + 7) / 8));
+		dataOutputLE.writeShort((bps / 8) * channels);
 		dataOutputLE.writeShort(bps);
 		dataOutput.write("data".getBytes());
 		dataOutputLE.writeInt((int) dataSize);

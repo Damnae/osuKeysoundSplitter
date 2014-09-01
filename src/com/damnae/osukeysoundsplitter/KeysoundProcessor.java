@@ -75,7 +75,7 @@ public class KeysoundProcessor {
 	private void extractKeysounds(File keysoundsFile, List<Keysound> keysounds)
 			throws IOException {
 
-		WavKeysoundWriter writer = new WavKeysoundWriter(keysoundsFile
+		KeysoundWriter writer = new OggKeysoundWriter(keysoundsFile
 				.getParentFile().getCanonicalPath() + "/",
 				getKeysoundsFolderPath(keysoundsFile));
 		KeysoundExtractor keysoundExtractor = new KeysoundExtractor(keysounds,
