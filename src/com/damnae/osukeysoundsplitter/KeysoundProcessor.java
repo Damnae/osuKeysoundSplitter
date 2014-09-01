@@ -20,6 +20,7 @@ import org.kc7bfi.jflac.FLACDecoder;
 import com.damnae.osukeysoundsplitter.OsuDiff.AudioArea;
 
 public class KeysoundProcessor {
+	private static final long SHORT_AUDIO_AREA_THREASHOLD = 10; // ms
 
 	class Keysound {
 		public String filename;
@@ -44,18 +45,27 @@ public class KeysoundProcessor {
 		List<Keysound> keysounds = new ArrayList<Keysound>();
 		for (AudioArea audioArea : osuDiff.audioAreas) {
 			if (audioArea.noteTimes.isEmpty()) {
-				Keysound keysound = new Keysound();
-				keysound.startTime = audioArea.startTime;
-				keysound.endTime = audioArea.endTime;
-				keysound.isEvent = true;
-				keysounds.add(keysound);
+				long areaDuration = audioArea.endTime - audioArea.startTime;
+
+				if (areaDuration > SHORT_AUDIO_AREA_THREASHOLD) {
+					Keysound keysound = new Keysound();
+					keysound.startTime = audioArea.startTime;
+					keysound.endTime = audioArea.endTime;
+					keysound.isEvent = true;
+					keysounds.add(keysound);
+				}
 
 			} else {
-				Keysound keysound = new Keysound();
-				keysound.startTime = audioArea.startTime;
-				keysound.endTime = audioArea.noteTimes.get(0);
-				keysound.isEvent = true;
-				keysounds.add(keysound);
+				long areaDuration = audioArea.noteTimes.get(0)
+						- audioArea.startTime;
+
+				if (areaDuration > SHORT_AUDIO_AREA_THREASHOLD) {
+					Keysound keysound = new Keysound();
+					keysound.startTime = audioArea.startTime;
+					keysound.endTime = audioArea.noteTimes.get(0);
+					keysound.isEvent = true;
+					keysounds.add(keysound);
+				}
 			}
 
 			for (int i = 0, size = audioArea.noteTimes.size(); i < size; ++i) {
