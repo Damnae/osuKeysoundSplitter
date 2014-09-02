@@ -9,6 +9,5 @@ public class Main {
 
 	public static void main(String[] args) throws IOException {
 		new MapsetProcessor().process(FOLDER_PATH, OFFSET);
-		System.out.println("Done");
 	}
 }

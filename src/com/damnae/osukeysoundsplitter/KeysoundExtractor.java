@@ -40,8 +40,6 @@ public class KeysoundExtractor implements PCMProcessor {
 	@Override
 	public void processStreamInfo(StreamInfo info) {
 		System.out.println(info);
-		System.out.println(info.getSampleRate() * (info.getBitsPerSample() / 8)
-				* info.getChannels());
 
 		this.info = info;
 		this.bytesPerSample = (info.getBitsPerSample() / 8)
@@ -131,7 +129,7 @@ public class KeysoundExtractor implements PCMProcessor {
 	}
 
 	private void writeKeysound(int index) throws IOException {
-		System.out.println("Writing keysound " + (index + 1) + " / "
+		System.out.println("Extracted keysound " + (index + 1) + " / "
 				+ keysounds.size());
 		keysounds.get(index).filename = keysoundWriter.writeKeysound(
 				bos.toByteArray(), info);

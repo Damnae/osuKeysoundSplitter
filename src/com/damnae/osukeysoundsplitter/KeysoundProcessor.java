@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import org.kc7bfi.jflac.FLACDecoder;
 
@@ -34,7 +35,8 @@ public class KeysoundProcessor {
 	private List<String> keysoundFiles = new ArrayList<String>();
 
 	public void process(File diffFile, File keysoundsFile, int offset,
-			KeysoundPathProvider keysoundPathProvider) throws IOException {
+			KeysoundPathProvider keysoundPathProvider,
+			ExecutorService executorService) throws IOException {
 
 		OsuDiff osuDiff = new OsuDiff(diffFile);
 		List<Keysound> diffKeysounds = getKeysounds(osuDiff);
@@ -42,7 +44,8 @@ public class KeysoundProcessor {
 			return;
 
 		extractKeysounds(keysoundsFile, diffKeysounds, offset,
-				keysoundPathProvider);
+				keysoundPathProvider, executorService);
+
 		keysounds.addAll(diffKeysounds);
 		keysoundFiles.add(getKeysoundsFolderPath(keysoundsFile));
 	}
@@ -51,13 +54,6 @@ public class KeysoundProcessor {
 		insertKeysounds(diffFile, keysounds, keysoundFiles);
 		keysounds.clear();
 		keysoundFiles.clear();
-	}
-
-	public void processAndInsert(File diffFile, File keysoundsFile, int offset)
-			throws IOException {
-
-		process(diffFile, keysoundsFile, offset, new KeysoundPathProvider());
-		insertKeysounds(diffFile);
 	}
 
 	private List<Keysound> getKeysounds(OsuDiff osuDiff) {
@@ -96,12 +92,13 @@ public class KeysoundProcessor {
 	}
 
 	private void extractKeysounds(File keysoundsFile, List<Keysound> keysounds,
-			int offset, KeysoundPathProvider keysoundPathProvider)
-			throws IOException {
+			int offset, KeysoundPathProvider keysoundPathProvider,
+			ExecutorService executorService) throws IOException {
 
 		KeysoundWriter writer = new OggKeysoundWriter(keysoundsFile
 				.getParentFile().getCanonicalPath() + "/",
-				getKeysoundsFolderPath(keysoundsFile), keysoundPathProvider);
+				getKeysoundsFolderPath(keysoundsFile), keysoundPathProvider,
+				executorService);
 		KeysoundExtractor keysoundExtractor = new KeysoundExtractor(keysounds,
 				writer, offset);
 

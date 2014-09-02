@@ -21,22 +21,30 @@ public class KeysoundPathProvider {
 		}
 	}
 
-	public String getKeysoundPath(String folderPath, byte[] data,
-			String extension) {
-
+	public String getIdentifier(byte[] data) {
 		byte[] mdbytes = messageDigest.digest(data);
 
 		for (byte mdbyte : mdbytes) {
 			sb.append(Integer.toString((mdbyte & 0xff) + 0x100, 16)
 					.substring(1));
 		}
-		String hash = sb.toString();
+		String identifier = sb.toString();
 		sb.setLength(0);
 
-		String path = existingKeysounds.get(hash);
+		return identifier;
+	}
+
+	public boolean isRegistered(String keysoundIdentifier) {
+		return existingKeysounds.containsKey(keysoundIdentifier);
+	}
+
+	public String getKeysoundPath(String folderPath, String keysoundIdentifier,
+			String extension) {
+
+		String path = existingKeysounds.get(keysoundIdentifier);
 		if (path == null) {
 			path = folderPath + fileIndex++ + "." + extension;
-			existingKeysounds.put(hash, path);
+			existingKeysounds.put(keysoundIdentifier, path);
 		}
 
 		return path;

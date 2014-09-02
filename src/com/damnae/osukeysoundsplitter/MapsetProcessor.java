@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class MapsetProcessor {
 
@@ -17,6 +20,8 @@ public class MapsetProcessor {
 	private static final String DIFF_FILE_EXTENSION = ".osu";
 
 	public void process(String folderPath, int offset) throws IOException {
+		long startTime = System.nanoTime();
+
 		File folder = new File(folderPath);
 
 		File[] keysoundTrackFiles = folder.listFiles(new FilenameFilter() {
@@ -33,6 +38,8 @@ public class MapsetProcessor {
 			}
 		});
 
+		ExecutorService executorService = Executors.newFixedThreadPool(Math
+				.max(1, Runtime.getRuntime().availableProcessors() - 1));
 		Map<String, DiffContext> diffContexts = new HashMap<String, DiffContext>();
 
 		for (File keysoundTrackFile : keysoundTrackFiles) {
@@ -56,7 +63,7 @@ public class MapsetProcessor {
 						+ "\" with keysound track \"" + keysoundTrackName
 						+ "\" for diff \"" + contextName + "\"");
 				context.keysoundProcessor.process(diffFile, keysoundTrackFile,
-						offset, keysoundPathProvider);
+						offset, keysoundPathProvider, executorService);
 			}
 		}
 
@@ -76,6 +83,19 @@ public class MapsetProcessor {
 				break;
 			}
 		}
+
+		executorService.shutdown();
+		try {
+			while (!executorService.awaitTermination(10, TimeUnit.SECONDS))
+				;
+
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+
+		long duration = System.nanoTime() - startTime;
+		System.out.println("Processed mapset in " + duration / 1000000000.0
+				+ "s");
 	}
 
 	private String getKeysoundTrackName(File keysoundTrackFile) {

@@ -4,6 +4,7 @@ import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 
 import org.kc7bfi.jflac.metadata.StreamInfo;
 import org.kc7bfi.jflac.util.LittleEndianDataOutput;
@@ -11,8 +12,10 @@ import org.kc7bfi.jflac.util.LittleEndianDataOutput;
 public class WavKeysoundWriter extends BaseKeysoundWriter {
 
 	public WavKeysoundWriter(String mapFolderPath, String keysoundFolderPath,
-			KeysoundPathProvider keysoundPathProvider) {
-		super(mapFolderPath, keysoundFolderPath, keysoundPathProvider);
+			KeysoundPathProvider keysoundPathProvider,
+			ExecutorService executorService) {
+		super(mapFolderPath, keysoundFolderPath, keysoundPathProvider,
+				executorService);
 	}
 
 	@Override

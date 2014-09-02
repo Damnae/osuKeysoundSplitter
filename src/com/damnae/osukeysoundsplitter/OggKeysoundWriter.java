@@ -3,6 +3,7 @@ package com.damnae.osukeysoundsplitter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
 
 import org.kc7bfi.jflac.metadata.StreamInfo;
 import org.xiph.libogg.ogg_packet;
@@ -18,8 +19,10 @@ public class OggKeysoundWriter extends BaseKeysoundWriter {
 	private static final int SAMPLE_COUNT = 1024;
 
 	public OggKeysoundWriter(String mapFolderPath, String keysoundFolderPath,
-			KeysoundPathProvider keysoundPathProvider) {
-		super(mapFolderPath, keysoundFolderPath, keysoundPathProvider);
+			KeysoundPathProvider keysoundPathProvider,
+			ExecutorService executorService) {
+		super(mapFolderPath, keysoundFolderPath, keysoundPathProvider,
+				executorService);
 	}
 
 	@Override
