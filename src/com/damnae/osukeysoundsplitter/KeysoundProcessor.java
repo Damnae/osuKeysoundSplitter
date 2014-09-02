@@ -137,6 +137,22 @@ public class KeysoundProcessor {
 						writer.append(line);
 						writer.newLine();
 
+						if (sectionName.equals("HitObjects")) {
+							for (Keysound keysound : keysounds) {
+								if (keysound.isAutosound)
+									continue;
+
+								int colonPos = line.lastIndexOf(":");
+								if (colonPos > -1) {
+									line = line.substring(0, colonPos) + ":"
+											+ keysound.filename;
+								}
+
+								writer.append(keysound.data);
+								writer.newLine();
+							}
+						}
+
 					} else if (sectionName != null) {
 						if (sectionName.equals("Events")) {
 							if (line.startsWith("Sample")) {
@@ -170,29 +186,7 @@ public class KeysoundProcessor {
 								}
 							}
 
-						} else if (sectionName.equals("HitObjects")) {
-							String[] values = line.split(",");
-							final long startTime = Integer.parseInt(values[2]);
-
-							for (Keysound keysound : keysounds) {
-								if (keysound.isAutosound)
-									continue;
-
-								if (keysound.startTime != startTime)
-									continue;
-
-								int colonPos = line.lastIndexOf(":");
-								if (colonPos > -1) {
-									line = line.substring(0, colonPos) + ":"
-											+ keysound.filename;
-								}
-								break;
-							}
-
-							writer.append(line);
-							writer.newLine();
-
-						} else {
+						} else if (!sectionName.equals("HitObjects")) {
 							writer.append(line);
 							writer.newLine();
 						}
