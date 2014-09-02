@@ -36,7 +36,8 @@ public class KeysoundProcessor {
 		OsuDiff osuDiff = new OsuDiff(diffFile);
 		List<Keysound> keysounds = getKeysounds(osuDiff);
 		extractKeysounds(keysoundsFile, keysounds, offset);
-		insertKeysounds(diffFile, keysounds);
+		insertKeysounds(diffFile, keysounds,
+				getKeysoundsFolderPath(keysoundsFile));
 	}
 
 	private List<Keysound> getKeysounds(OsuDiff osuDiff) {
@@ -108,8 +109,8 @@ public class KeysoundProcessor {
 				extensionPos) + "/";
 	}
 
-	private void insertKeysounds(File diffFile, List<Keysound> keysounds)
-			throws IOException {
+	private void insertKeysounds(File diffFile, List<Keysound> keysounds,
+			String keysoundFolderPath) throws IOException {
 
 		File backupFile = new File(diffFile.getCanonicalPath() + ".bak");
 		if (!backupFile.exists())
@@ -123,7 +124,6 @@ public class KeysoundProcessor {
 			BufferedWriter writer = new BufferedWriter(outputStreamWriter);
 
 			String sectionName = null;
-			String ignoreUntilLine = null;
 			try {
 				for (int i = 0, size = lines.size(); i < size; ++i) {
 					String line = lines.get(i);
@@ -136,33 +136,37 @@ public class KeysoundProcessor {
 						writer.append(line);
 						writer.newLine();
 
-						ignoreUntilLine = null;
-
-					} else if (ignoreUntilLine != null) {
-						if (line.equals(ignoreUntilLine)) {
-							ignoreUntilLine = null;
-
-							writer.append(line);
-							writer.newLine();
-						}
-
-					} else if (ignoreUntilLine == null && sectionName != null) {
+					} else if (sectionName != null) {
 						if (sectionName.equals("Events")) {
-							writer.append(line);
-							writer.newLine();
+							if (line.startsWith("Sample")) {
+								String[] values = line.split(",");
+								String samplePath = values[3];
 
-							if (line.equals("//Storyboard Sound Samples")) {
-								for (Keysound keysound : keysounds) {
-									if (!keysound.isAutosound)
-										continue;
+								if (!samplePath.startsWith("\""
+										+ keysoundFolderPath)
+										&& !samplePath.startsWith("\""
+												+ keysoundFolderPath.replace(
+														'/', '\\'))) {
 
-									writer.append("Sample,"
-											+ keysound.startTime + ",0,\""
-											+ keysound.filename + "\",100");
+									writer.append(line);
 									writer.newLine();
 								}
 
-								ignoreUntilLine = "//Background Colour Transformations";
+							} else {
+								writer.append(line);
+								writer.newLine();
+
+								if (line.equals("//Storyboard Sound Samples")) {
+									for (Keysound keysound : keysounds) {
+										if (!keysound.isAutosound)
+											continue;
+
+										writer.append("Sample,"
+												+ keysound.startTime + ",0,\""
+												+ keysound.filename + "\",100");
+										writer.newLine();
+									}
+								}
 							}
 
 						} else if (sectionName.equals("HitObjects")) {
@@ -192,7 +196,7 @@ public class KeysoundProcessor {
 							writer.newLine();
 						}
 
-					} else if (ignoreUntilLine == null) {
+					} else {
 						writer.append(line);
 						writer.newLine();
 					}
