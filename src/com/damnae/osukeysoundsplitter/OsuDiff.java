@@ -20,6 +20,11 @@ public class OsuDiff {
 		public boolean isSplittingPoint() {
 			return data == null;
 		}
+
+		@Override
+		public String toString() {
+			return time + " " + data;
+		}
 	}
 
 	public List<DiffEvent> diffEvents = new ArrayList<DiffEvent>();
@@ -54,7 +59,11 @@ public class OsuDiff {
 
 			@Override
 			public int compare(DiffEvent event1, DiffEvent event2) {
-				return (int) (event1.time - event2.time);
+				int value = (int) (event1.time - event2.time);
+				if (value == 0)
+					value = (event1.data != null ? 1 : 0)
+							- (event2.data != null ? 1 : 0);
+				return value;
 			}
 		});
 	}

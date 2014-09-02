@@ -30,14 +30,30 @@ public class KeysoundProcessor {
 		public String data;
 	}
 
+	private List<Keysound> keysounds = new ArrayList<Keysound>();
+	private List<String> keysoundFiles = new ArrayList<String>();
+
 	public void process(File diffFile, File keysoundsFile, int offset)
 			throws IOException {
 
 		OsuDiff osuDiff = new OsuDiff(diffFile);
-		List<Keysound> keysounds = getKeysounds(osuDiff);
-		extractKeysounds(keysoundsFile, keysounds, offset);
-		insertKeysounds(diffFile, keysounds,
-				getKeysoundsFolderPath(keysoundsFile));
+		List<Keysound> diffKeysounds = getKeysounds(osuDiff);
+		extractKeysounds(keysoundsFile, diffKeysounds, offset);
+		keysounds.addAll(diffKeysounds);
+		keysoundFiles.add(getKeysoundsFolderPath(keysoundsFile));
+	}
+
+	public void insertKeysounds(File diffFile) throws IOException {
+		insertKeysounds(diffFile, keysounds, keysoundFiles);
+		keysounds.clear();
+		keysoundFiles.clear();
+	}
+
+	public void processAndInsert(File diffFile, File keysoundsFile, int offset)
+			throws IOException {
+
+		process(diffFile, keysoundsFile, offset);
+		insertKeysounds(diffFile);
 	}
 
 	private List<Keysound> getKeysounds(OsuDiff osuDiff) {
@@ -110,7 +126,7 @@ public class KeysoundProcessor {
 	}
 
 	private void insertKeysounds(File diffFile, List<Keysound> keysounds,
-			String keysoundFolderPath) throws IOException {
+			List<String> keysoundFolderPaths) throws IOException {
 
 		File backupFile = new File(diffFile.getCanonicalPath() + ".bak");
 		if (backupFile.exists())
@@ -142,13 +158,15 @@ public class KeysoundProcessor {
 								if (keysound.isAutosound)
 									continue;
 
-								int colonPos = line.lastIndexOf(":");
+								String keysoundData = keysound.data;
+
+								int colonPos = keysoundData.lastIndexOf(":");
 								if (colonPos > -1) {
-									line = line.substring(0, colonPos) + ":"
-											+ keysound.filename;
+									keysoundData = keysoundData.substring(0,
+											colonPos) + ":" + keysound.filename;
 								}
 
-								writer.append(keysound.data);
+								writer.append(keysoundData);
 								writer.newLine();
 							}
 						}
@@ -159,12 +177,10 @@ public class KeysoundProcessor {
 								String[] values = line.split(",");
 								String samplePath = values[3];
 
-								if (!samplePath.startsWith("\""
-										+ keysoundFolderPath)
-										&& !samplePath.startsWith("\""
-												+ keysoundFolderPath.replace(
-														'/', '\\'))) {
+								boolean keepSample = !isSampleInKeysoundFolder(
+										samplePath, keysoundFolderPaths);
 
+								if (keepSample) {
 									writer.append(line);
 									writer.newLine();
 								}
@@ -231,5 +247,21 @@ public class KeysoundProcessor {
 		}
 
 		return lines;
+	}
+
+	private boolean isSampleInKeysoundFolder(String samplePath,
+			List<String> keysoundFolderPaths) {
+
+		boolean keepSample = false;
+		for (String keysoundFolderPath : keysoundFolderPaths) {
+			if (samplePath.startsWith("\"" + keysoundFolderPath)
+					|| samplePath.startsWith("\""
+							+ keysoundFolderPath.replace('/', '\\'))) {
+
+				keepSample = true;
+				break;
+			}
+		}
+		return keepSample;
 	}
 }

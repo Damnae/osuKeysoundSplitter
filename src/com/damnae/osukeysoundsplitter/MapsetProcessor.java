@@ -3,8 +3,16 @@ package com.damnae.osukeysoundsplitter;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class MapsetProcessor {
+
+	private class DiffContext {
+		public KeysoundProcessor keysoundProcessor = new KeysoundProcessor();
+	}
+
 	private static final String KEYSOUND_TRACK_EXTENSION = ".flac";
 	private static final String DIFF_FILE_EXTENSION = ".osu";
 
@@ -25,17 +33,46 @@ public class MapsetProcessor {
 			}
 		});
 
+		Map<String, DiffContext> diffContexts = new HashMap<String, DiffContext>();
+
 		for (File keysoundTrackFile : keysoundTrackFiles) {
 			String keysoundTrackName = getKeysoundTrackName(keysoundTrackFile);
 			for (File diffFile : diffFiles) {
 				String diffName = getDiffName(diffFile);
-				if (diffName == null || !diffName.startsWith(keysoundTrackName))
+				String suffix = "-" + keysoundTrackName;
+				if (diffName == null || !diffName.endsWith(suffix))
 					continue;
 
-				System.out.println("Processing diff " + diffName
-						+ " with keysound track " + keysoundTrackName);
-				new KeysoundProcessor().process(diffFile, keysoundTrackFile,
+				String contextName = diffName.substring(0,
+						diffName.length() - suffix.length()).trim();
+				DiffContext context = diffContexts.get(contextName);
+				if (context == null) {
+					context = new DiffContext();
+					diffContexts.put(contextName, context);
+				}
+
+				System.out.println("Processing diff \"" + diffName
+						+ "\" with keysound track \"" + keysoundTrackName
+						+ "\" for diff \"" + contextName + "\"");
+				context.keysoundProcessor.process(diffFile, keysoundTrackFile,
 						offset);
+			}
+		}
+
+		for (Entry<String, DiffContext> diffContextEntry : diffContexts
+				.entrySet()) {
+
+			String contextName = diffContextEntry.getKey();
+			DiffContext context = diffContextEntry.getValue();
+
+			for (File diffFile : diffFiles) {
+				String diffName = getDiffName(diffFile);
+				if (diffName == null || !diffName.equals(contextName))
+					continue;
+
+				System.out.println("Inserting keysounds in " + contextName);
+				context.keysoundProcessor.insertKeysounds(diffFile);
+				break;
 			}
 		}
 	}
