@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.kc7bfi.jflac.FLACDecoder;
 
-import com.damnae.osukeysoundsplitter.OsuDiff.AudioArea;
+import com.damnae.osukeysoundsplitter.OsuDiff.DiffEvent;
 
 public class KeysoundProcessor {
 	private static final long SHORT_AUDIO_AREA_THRESHOLD = 10; // ms
@@ -26,7 +26,8 @@ public class KeysoundProcessor {
 		public String filename;
 		public long startTime;
 		public long endTime;
-		public boolean isEvent;
+		public boolean isAutosound;
+		public String data;
 	}
 
 	public void process(File diffFile, File keysoundsFile, int offset)
@@ -39,46 +40,35 @@ public class KeysoundProcessor {
 	}
 
 	private List<Keysound> getKeysounds(OsuDiff osuDiff) {
-		// This assumes audioArea.noteTimes is sorted,
-		// which is as long as the .osu is
-
 		List<Keysound> keysounds = new ArrayList<Keysound>();
-		for (AudioArea audioArea : osuDiff.audioAreas) {
-			if (audioArea.noteTimes.isEmpty()) {
-				long areaDuration = audioArea.endTime - audioArea.startTime;
 
-				if (areaDuration > SHORT_AUDIO_AREA_THRESHOLD) {
-					Keysound keysound = new Keysound();
-					keysound.startTime = audioArea.startTime;
-					keysound.endTime = audioArea.endTime;
-					keysound.isEvent = true;
-					keysounds.add(keysound);
-				}
+		boolean inSoundSection = false;
+		for (int i = 0, size = osuDiff.diffEvents.size(); i < size - 1; ++i) {
+			DiffEvent diffEvent = osuDiff.diffEvents.get(i);
+			DiffEvent nextDiffEvent = osuDiff.diffEvents.get(i + 1);
 
-			} else {
-				long areaDuration = audioArea.noteTimes.get(0)
-						- audioArea.startTime;
+			boolean isSplittingPoint = diffEvent.isSplittingPoint();
+			if (isSplittingPoint)
+				inSoundSection = !nextDiffEvent.isSplittingPoint()
+						|| !inSoundSection;
+			else
+				inSoundSection = true;
 
-				if (areaDuration > SHORT_AUDIO_AREA_THRESHOLD) {
-					Keysound keysound = new Keysound();
-					keysound.startTime = audioArea.startTime;
-					keysound.endTime = audioArea.noteTimes.get(0);
-					keysound.isEvent = true;
-					keysounds.add(keysound);
-				}
-			}
+			if (!inSoundSection)
+				continue;
 
-			for (int i = 0, size = audioArea.noteTimes.size(); i < size; ++i) {
-				long startTime = audioArea.noteTimes.get(i);
-				long endTime = i < size - 1 ? audioArea.noteTimes.get(i + 1)
-						: audioArea.endTime;
+			boolean isAutosound = isSplittingPoint;
 
-				Keysound keysound = new Keysound();
-				keysound.startTime = startTime;
-				keysound.endTime = endTime;
-				keysound.isEvent = false;
-				keysounds.add(keysound);
-			}
+			long duration = nextDiffEvent.time - diffEvent.time;
+			if (isAutosound && duration < SHORT_AUDIO_AREA_THRESHOLD)
+				continue;
+
+			Keysound keysound = new Keysound();
+			keysound.startTime = diffEvent.time;
+			keysound.endTime = nextDiffEvent.time;
+			keysound.isAutosound = isAutosound;
+			keysound.data = diffEvent.data;
+			keysounds.add(keysound);
 		}
 
 		return keysounds;
@@ -137,6 +127,9 @@ public class KeysoundProcessor {
 			try {
 				for (int i = 0, size = lines.size(); i < size; ++i) {
 					String line = lines.get(i);
+					if (line.length() == 0)
+						sectionName = null;
+
 					if (line.startsWith("[") && line.endsWith("]")) {
 						sectionName = line.substring(1, line.length() - 1);
 
@@ -160,12 +153,13 @@ public class KeysoundProcessor {
 
 							if (line.equals("//Storyboard Sound Samples")) {
 								for (Keysound keysound : keysounds) {
-									if (keysound.isEvent) {
-										writer.append("Sample,"
-												+ keysound.startTime + ",0,\""
-												+ keysound.filename + "\",100");
-										writer.newLine();
-									}
+									if (!keysound.isAutosound)
+										continue;
+
+									writer.append("Sample,"
+											+ keysound.startTime + ",0,\""
+											+ keysound.filename + "\",100");
+									writer.newLine();
 								}
 
 								ignoreUntilLine = "//Background Colour Transformations";
@@ -176,14 +170,18 @@ public class KeysoundProcessor {
 							final long startTime = Integer.parseInt(values[2]);
 
 							for (Keysound keysound : keysounds) {
-								if (keysound.startTime == startTime) {
-									int colonPos = line.lastIndexOf(":");
-									if (colonPos > -1) {
-										line = line.substring(0, colonPos)
-												+ ":" + keysound.filename;
-									}
-									break;
+								if (keysound.isAutosound)
+									continue;
+
+								if (keysound.startTime != startTime)
+									continue;
+
+								int colonPos = line.lastIndexOf(":");
+								if (colonPos > -1) {
+									line = line.substring(0, colonPos) + ":"
+											+ keysound.filename;
 								}
+								break;
 							}
 
 							writer.append(line);

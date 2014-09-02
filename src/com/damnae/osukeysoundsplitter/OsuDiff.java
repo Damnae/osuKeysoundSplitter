@@ -7,17 +7,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class OsuDiff {
 
-	public class AudioArea {
-		public long startTime;
-		public long endTime;
-		public List<Long> noteTimes = new ArrayList<Long>();
+	public class DiffEvent {
+		public long time;
+		public String data;
+
+		public boolean isSplittingPoint() {
+			return data == null;
+		}
 	}
 
-	public List<AudioArea> audioAreas = new ArrayList<AudioArea>();
+	public List<DiffEvent> diffEvents = new ArrayList<DiffEvent>();
 
 	public OsuDiff(File file) throws IOException {
 		FileInputStream is = new FileInputStream(file);
@@ -44,6 +49,14 @@ public class OsuDiff {
 		} finally {
 			is.close();
 		}
+
+		Collections.sort(diffEvents, new Comparator<DiffEvent>() {
+
+			@Override
+			public int compare(DiffEvent event1, DiffEvent event2) {
+				return (int) (event1.time - event2.time);
+			}
+		});
 	}
 
 	private void parseOsuEditorSection(BufferedReader reader)
@@ -61,11 +74,10 @@ public class OsuDiff {
 			if (key.equals("Bookmarks")) {
 				String[] bookmarks = value.split(",");
 
-				for (int i = 0, size = bookmarks.length; i < size; i += 2) {
-					AudioArea audioArea = new AudioArea();
-					audioArea.startTime = Integer.valueOf(bookmarks[i]);
-					audioArea.endTime = Integer.valueOf(bookmarks[i + 1]);
-					audioAreas.add(audioArea);
+				for (String bookmark : bookmarks) {
+					DiffEvent diffEvent = new DiffEvent();
+					diffEvent.time = Integer.valueOf(bookmark);
+					diffEvents.add(diffEvent);
 				}
 			}
 		}
@@ -83,14 +95,10 @@ public class OsuDiff {
 			String[] values = line.split(",");
 			final long startTime = Integer.parseInt(values[2]);
 
-			for (AudioArea audioArea : audioAreas) {
-				if (audioArea.startTime <= startTime
-						&& startTime < audioArea.endTime) {
-
-					audioArea.noteTimes.add(startTime);
-					break;
-				}
-			}
+			DiffEvent diffEvent = new DiffEvent();
+			diffEvent.time = startTime;
+			diffEvent.data = line;
+			diffEvents.add(diffEvent);
 		}
 	}
 

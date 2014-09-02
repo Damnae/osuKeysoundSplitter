@@ -18,7 +18,6 @@ public static final String FOLDER_PATH = "C:/Games/osu!/Songs/208734 SNoW - Nigh
 `FOLDER_PATH` is the absolute path to the mapset and `DIFF_FILE` the relative path to the instrumental diff that will get keysounded.
 * Run!
 * Once done you can remove the complete mp3, its diff and the voice flac.
-* 
 
 ## FAQTS
 
@@ -27,4 +26,3 @@ public static final String FOLDER_PATH = "C:/Games/osu!/Songs/208734 SNoW - Nigh
  * No, there's no user interface and no .jar yet. You have to compile it and run it.
  * No, it's only for .osu files, so no .bme.
  * No, it doesn't work with sliders yet; osu! doesn't support the way I insert hitsounds in an .osu when it's a slider.
- 
