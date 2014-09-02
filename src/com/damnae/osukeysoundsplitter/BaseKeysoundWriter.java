@@ -9,20 +9,25 @@ import org.kc7bfi.jflac.metadata.StreamInfo;
 public abstract class BaseKeysoundWriter implements KeysoundWriter {
 	private String mapFolderPath;
 	private String keysoundFolderPath;
+	private KeysoundPathProvider keysoundPathProvider;
 
-	public BaseKeysoundWriter(String mapFolderPath, String keysoundFolderPath) {
+	public BaseKeysoundWriter(String mapFolderPath, String keysoundFolderPath,
+			KeysoundPathProvider keysoundPathProvider) {
+
 		this.mapFolderPath = mapFolderPath;
 		this.keysoundFolderPath = keysoundFolderPath;
+		this.keysoundPathProvider = keysoundPathProvider;
 
 		File folder = new File(mapFolderPath + keysoundFolderPath);
 		folder.mkdir();
 	}
 
 	@Override
-	public String writeKeysound(String filename, byte[] data,
-			StreamInfo streamInfo) throws IOException {
+	public String writeKeysound(byte[] data, StreamInfo streamInfo)
+			throws IOException {
 
-		String path = keysoundFolderPath + filename + "." + getExtension();
+		String path = keysoundPathProvider.getKeysoundPath(keysoundFolderPath,
+				data, getExtension());
 		FileOutputStream os = new FileOutputStream(mapFolderPath + path);
 		try {
 			writeKeysound(os, data, streamInfo);

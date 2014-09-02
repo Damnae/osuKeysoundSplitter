@@ -6,6 +6,5 @@ import org.kc7bfi.jflac.metadata.StreamInfo;
 
 public interface KeysoundWriter {
 
-	String writeKeysound(String filename, byte[] data, StreamInfo streamInfo)
-			throws IOException;
+	String writeKeysound(byte[] data, StreamInfo streamInfo) throws IOException;
 }

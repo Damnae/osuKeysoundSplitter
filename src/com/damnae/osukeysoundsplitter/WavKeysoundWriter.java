@@ -10,8 +10,9 @@ import org.kc7bfi.jflac.util.LittleEndianDataOutput;
 
 public class WavKeysoundWriter extends BaseKeysoundWriter {
 
-	public WavKeysoundWriter(String mapFolderPath, String keysoundFolderPath) {
-		super(mapFolderPath, keysoundFolderPath);
+	public WavKeysoundWriter(String mapFolderPath, String keysoundFolderPath,
+			KeysoundPathProvider keysoundPathProvider) {
+		super(mapFolderPath, keysoundFolderPath, keysoundPathProvider);
 	}
 
 	@Override

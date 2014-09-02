@@ -17,8 +17,9 @@ import org.xiph.libvorbis.vorbisenc;
 public class OggKeysoundWriter extends BaseKeysoundWriter {
 	private static final int SAMPLE_COUNT = 1024;
 
-	public OggKeysoundWriter(String mapFolderPath, String keysoundFolderPath) {
-		super(mapFolderPath, keysoundFolderPath);
+	public OggKeysoundWriter(String mapFolderPath, String keysoundFolderPath,
+			KeysoundPathProvider keysoundPathProvider) {
+		super(mapFolderPath, keysoundFolderPath, keysoundPathProvider);
 	}
 
 	@Override

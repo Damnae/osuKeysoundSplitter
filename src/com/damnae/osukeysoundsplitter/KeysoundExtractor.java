@@ -134,6 +134,6 @@ public class KeysoundExtractor implements PCMProcessor {
 		System.out.println("Writing keysound " + (index + 1) + " / "
 				+ keysounds.size());
 		keysounds.get(index).filename = keysoundWriter.writeKeysound(
-				String.valueOf(index), bos.toByteArray(), info);
+				bos.toByteArray(), info);
 	}
 }

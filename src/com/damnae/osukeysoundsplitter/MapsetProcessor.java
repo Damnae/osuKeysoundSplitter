@@ -37,6 +37,7 @@ public class MapsetProcessor {
 
 		for (File keysoundTrackFile : keysoundTrackFiles) {
 			String keysoundTrackName = getKeysoundTrackName(keysoundTrackFile);
+			KeysoundPathProvider keysoundPathProvider = new KeysoundPathProvider();
 			for (File diffFile : diffFiles) {
 				String diffName = getDiffName(diffFile);
 				String suffix = "-" + keysoundTrackName;
@@ -55,7 +56,7 @@ public class MapsetProcessor {
 						+ "\" with keysound track \"" + keysoundTrackName
 						+ "\" for diff \"" + contextName + "\"");
 				context.keysoundProcessor.process(diffFile, keysoundTrackFile,
-						offset);
+						offset, keysoundPathProvider);
 			}
 		}
 

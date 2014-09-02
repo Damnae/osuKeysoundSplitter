@@ -33,12 +33,16 @@ public class KeysoundProcessor {
 	private List<Keysound> keysounds = new ArrayList<Keysound>();
 	private List<String> keysoundFiles = new ArrayList<String>();
 
-	public void process(File diffFile, File keysoundsFile, int offset)
-			throws IOException {
+	public void process(File diffFile, File keysoundsFile, int offset,
+			KeysoundPathProvider keysoundPathProvider) throws IOException {
 
 		OsuDiff osuDiff = new OsuDiff(diffFile);
 		List<Keysound> diffKeysounds = getKeysounds(osuDiff);
-		extractKeysounds(keysoundsFile, diffKeysounds, offset);
+		if (diffKeysounds.isEmpty())
+			return;
+
+		extractKeysounds(keysoundsFile, diffKeysounds, offset,
+				keysoundPathProvider);
 		keysounds.addAll(diffKeysounds);
 		keysoundFiles.add(getKeysoundsFolderPath(keysoundsFile));
 	}
@@ -52,7 +56,7 @@ public class KeysoundProcessor {
 	public void processAndInsert(File diffFile, File keysoundsFile, int offset)
 			throws IOException {
 
-		process(diffFile, keysoundsFile, offset);
+		process(diffFile, keysoundsFile, offset, new KeysoundPathProvider());
 		insertKeysounds(diffFile);
 	}
 
@@ -92,11 +96,12 @@ public class KeysoundProcessor {
 	}
 
 	private void extractKeysounds(File keysoundsFile, List<Keysound> keysounds,
-			int offset) throws IOException {
+			int offset, KeysoundPathProvider keysoundPathProvider)
+			throws IOException {
 
 		KeysoundWriter writer = new OggKeysoundWriter(keysoundsFile
 				.getParentFile().getCanonicalPath() + "/",
-				getKeysoundsFolderPath(keysoundsFile));
+				getKeysoundsFolderPath(keysoundsFile), keysoundPathProvider);
 		KeysoundExtractor keysoundExtractor = new KeysoundExtractor(keysounds,
 				writer, offset);
 
