@@ -113,8 +113,9 @@ public class KeysoundProcessor {
 			String keysoundFolderPath) throws IOException {
 
 		File backupFile = new File(diffFile.getCanonicalPath() + ".bak");
-		if (!backupFile.exists())
-			Files.copy(diffFile.toPath(), backupFile.toPath());
+		if (backupFile.exists())
+			backupFile.delete();
+		Files.copy(diffFile.toPath(), backupFile.toPath());
 
 		List<String> lines = retrieveLines(diffFile);
 		FileOutputStream os = new FileOutputStream(diffFile);
