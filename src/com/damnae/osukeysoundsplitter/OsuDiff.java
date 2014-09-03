@@ -104,10 +104,21 @@ public class OsuDiff {
 			String[] values = line.split(",");
 			final long startTime = Integer.parseInt(values[2]);
 
-			DiffEvent diffEvent = new DiffEvent();
-			diffEvent.time = startTime;
-			diffEvent.data = line;
-			diffEvents.add(diffEvent);
+			boolean isSimultaneous = false;
+			for (DiffEvent diffEvent : diffEvents) {
+				if (diffEvent.time == startTime && diffEvent.data != null) {
+					diffEvent.data += "\n" + line;
+					isSimultaneous = true;
+					break;
+				}
+			}
+
+			if (!isSimultaneous) {
+				DiffEvent diffEvent = new DiffEvent();
+				diffEvent.time = startTime;
+				diffEvent.data = line;
+				diffEvents.add(diffEvent);
+			}
 		}
 	}
 

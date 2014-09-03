@@ -164,16 +164,14 @@ public class KeysoundProcessor {
 								if (keysound.isAutosound)
 									continue;
 
-								String keysoundData = keysound.data;
-
-								int colonPos = keysoundData.lastIndexOf(":");
-								if (colonPos > -1) {
-									keysoundData = keysoundData.substring(0,
-											colonPos) + ":" + keysound.filename;
+								String[] keysoundDataLines = keysound.data
+										.split("\n");
+								int volume = 133 / keysoundDataLines.length;
+								for (String keysoundData : keysoundDataLines) {
+									writer.append(rewriteKeysoundData(keysound,
+											keysoundData, volume));
+									writer.newLine();
 								}
-
-								writer.append(keysoundData);
-								writer.newLine();
 							}
 						}
 
@@ -228,6 +226,40 @@ public class KeysoundProcessor {
 		}
 	}
 
+	private CharSequence rewriteKeysoundData(Keysound keysound,
+			String keysoundData, int volume) {
+
+		String[] values = keysoundData.split(",");
+		final int flags = Integer.parseInt(values[3]);
+
+		if (isNoteOrCircle(flags)) {
+			String[] hitsoundValues = splitValues(values[5], ':');
+			hitsoundValues[3] = String.valueOf(volume);
+			hitsoundValues[4] = keysound.filename;
+
+			values[5] = joinValues(hitsoundValues, ":");
+			keysoundData = joinValues(values, ",");
+
+		} else if (isLongNote(flags)) {
+			String[] lnValues = splitValues(values[5], ':');
+			lnValues[4] = String.valueOf(volume);
+			lnValues[5] = keysound.filename;
+
+			values[5] = joinValues(lnValues, ":");
+			keysoundData = joinValues(values, ",");
+		}
+
+		return keysoundData;
+	}
+
+	private boolean isNoteOrCircle(int flags) {
+		return (flags & 1) != 0;
+	}
+
+	private boolean isLongNote(int flags) {
+		return (flags & 128) != 0;
+	}
+
 	private List<String> retrieveLines(File file) throws FileNotFoundException,
 			IOException {
 
@@ -269,5 +301,37 @@ public class KeysoundProcessor {
 			}
 		}
 		return keepSample;
+	}
+
+	private String[] splitValues(String value, char separator) {
+		int[] indexes = new int[value.length()];
+		int indexCount = 0;
+		for (int i = 0, size = value.length(); i < size; ++i) {
+			char c = value.charAt(i);
+			if (c == separator) {
+				indexes[indexCount] = i;
+				++indexCount;
+			}
+		}
+
+		String[] values = new String[indexCount + 1];
+		values[0] = value.substring(0, indexes[0]);
+		for (int i = 1; i < indexCount; ++i) {
+			values[i] = value.substring(indexes[i - 1] + 1, indexes[i]);
+		}
+		values[values.length - 1] = value.substring(
+				indexes[indexCount - 1] + 1, value.length());
+
+		return values;
+	}
+
+	private String joinValues(String[] hitsoundValues, String separator) {
+		StringBuilder sb = new StringBuilder();
+		for (String hitsoundValue : hitsoundValues) {
+			if (sb.length() > 0)
+				sb.append(separator);
+			sb.append(hitsoundValue);
+		}
+		return sb.toString();
 	}
 }
