@@ -1,4 +1,4 @@
-package com.damnae.osukeysoundsplitter;
+package com.damnae.osukeysoundsplitter.writer;
 
 import java.io.IOException;
 

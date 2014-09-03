@@ -10,19 +10,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.damnae.osukeysoundsplitter.pathprovider.CounterKeysoundPathProvider;
+import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
+
 public class MapsetProcessor {
+
+	private static final String KEYSOUND_TRACK_EXTENSION = ".flac";
+	private static final String DIFF_FILE_EXTENSION = ".osu";
 
 	private class DiffContext {
 		public KeysoundProcessor keysoundProcessor = new KeysoundProcessor();
 	}
 
-	private static final String KEYSOUND_TRACK_EXTENSION = ".flac";
-	private static final String DIFF_FILE_EXTENSION = ".osu";
-
-	public void process(String folderPath, int offset) throws IOException {
+	public void process(File folder, int offset) throws IOException {
 		long startTime = System.nanoTime();
 
-		File folder = new File(folderPath);
 		System.out.println("Processing mapset in " + folder.getCanonicalPath());
 
 		File[] keysoundTrackFiles = folder.listFiles(new FilenameFilter() {
@@ -43,9 +45,9 @@ public class MapsetProcessor {
 				.max(1, Runtime.getRuntime().availableProcessors() - 1));
 		Map<String, DiffContext> diffContexts = new HashMap<String, DiffContext>();
 
+		KeysoundPathProvider keysoundPathProvider = new CounterKeysoundPathProvider();
 		for (File keysoundTrackFile : keysoundTrackFiles) {
 			String keysoundTrackName = getKeysoundTrackName(keysoundTrackFile);
-			KeysoundPathProvider keysoundPathProvider = new KeysoundPathProvider();
 			KeysoundTrackDecoder keysoundTrackDecoder = new KeysoundTrackDecoder(
 					keysoundTrackFile);
 
@@ -109,11 +111,11 @@ public class MapsetProcessor {
 	}
 
 	private String getKeysoundTrackName(File keysoundTrackFile) {
-		return getName(keysoundTrackFile);
+		return Utils.getFileNameWithoutExtension(keysoundTrackFile);
 	}
 
 	private String getDiffName(File diffFile) {
-		String name = getName(diffFile);
+		String name = Utils.getFileNameWithoutExtension(diffFile);
 		int beginIndex = name.lastIndexOf('[');
 		if (beginIndex == -1)
 			return null;
@@ -121,13 +123,5 @@ public class MapsetProcessor {
 		if (endIndex == -1)
 			return null;
 		return name.substring(beginIndex + 1, endIndex);
-	}
-
-	private String getName(File file) {
-		String name = file.getName();
-		int dotIndex = name.lastIndexOf('.');
-		if (dotIndex == -1)
-			return name;
-		return name.substring(0, dotIndex);
 	}
 }

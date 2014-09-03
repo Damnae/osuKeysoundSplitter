@@ -1,18 +1,18 @@
-package com.damnae.osukeysoundsplitter;
+package com.damnae.osukeysoundsplitter.pathprovider;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class KeysoundPathProvider {
+public class CounterKeysoundPathProvider implements KeysoundPathProvider {
 	private MessageDigest messageDigest;
 	private StringBuffer sb = new StringBuffer();
 
 	private int fileIndex;
-	private Map<String, String> existingKeysounds = new HashMap<String, String>();
+	private Map<String, String> keysoundPaths = new HashMap<String, String>();
 
-	public KeysoundPathProvider() {
+	public CounterKeysoundPathProvider() {
 		try {
 			messageDigest = MessageDigest.getInstance("SHA1");
 
@@ -21,6 +21,7 @@ public class KeysoundPathProvider {
 		}
 	}
 
+	@Override
 	public String getIdentifier(byte[] data) {
 		byte[] mdbytes = messageDigest.digest(data);
 
@@ -34,19 +35,20 @@ public class KeysoundPathProvider {
 		return identifier;
 	}
 
+	@Override
 	public boolean isRegistered(String keysoundIdentifier) {
-		return existingKeysounds.containsKey(keysoundIdentifier);
+		return keysoundPaths.containsKey(keysoundIdentifier);
 	}
 
-	public String getKeysoundPath(String folderPath, String keysoundIdentifier,
-			String extension) {
-
-		String path = existingKeysounds.get(keysoundIdentifier);
-		if (path == null) {
-			path = folderPath + fileIndex++ + "." + extension;
-			existingKeysounds.put(keysoundIdentifier, path);
+	@Override
+	public String getKeysoundPath(String keysoundIdentifier, String extension) {
+		String keysoundPath = keysoundPaths.get(keysoundIdentifier);
+		if (keysoundPath == null) {
+			++fileIndex;
+			keysoundPath = fileIndex + "." + extension;
+			keysoundPaths.put(keysoundIdentifier, keysoundPath);
 		}
 
-		return path;
+		return keysoundPath;
 	}
 }

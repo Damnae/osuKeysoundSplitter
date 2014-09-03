@@ -9,6 +9,7 @@ import org.kc7bfi.jflac.metadata.StreamInfo;
 import org.kc7bfi.jflac.util.ByteData;
 
 import com.damnae.osukeysoundsplitter.KeysoundProcessor.Keysound;
+import com.damnae.osukeysoundsplitter.writer.KeysoundWriter;
 
 public class KeysoundExtractor implements PCMProcessor {
 	private List<Keysound> keysounds;
@@ -131,7 +132,9 @@ public class KeysoundExtractor implements PCMProcessor {
 	private void writeKeysound(int index) throws IOException {
 		System.out.println("Extracted keysound " + (index + 1) + " / "
 				+ keysounds.size());
-		keysounds.get(index).filename = keysoundWriter.writeKeysound(
-				bos.toByteArray(), info);
+		String keysoundPath = keysoundWriter.writeKeysound(bos.toByteArray(),
+				info);
+
+		keysounds.get(index).filename = keysoundPath;
 	}
 }

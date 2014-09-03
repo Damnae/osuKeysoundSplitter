@@ -1,30 +1,26 @@
-package com.damnae.osukeysoundsplitter;
+package com.damnae.osukeysoundsplitter.writer;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
 import org.kc7bfi.jflac.metadata.StreamInfo;
 
+import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
+
 public abstract class BaseKeysoundWriter implements KeysoundWriter {
-	private String mapFolderPath;
-	private String keysoundFolderPath;
+	private File mapsetFolder;
 	private KeysoundPathProvider keysoundPathProvider;
 	private ExecutorService executorService;
 
-	public BaseKeysoundWriter(String mapFolderPath, String keysoundFolderPath,
+	public BaseKeysoundWriter(File mapsetFolder,
 			KeysoundPathProvider keysoundPathProvider,
 			ExecutorService executorService) {
 
-		this.mapFolderPath = mapFolderPath;
-		this.keysoundFolderPath = keysoundFolderPath;
+		this.mapsetFolder = mapsetFolder;
 		this.keysoundPathProvider = keysoundPathProvider;
 		this.executorService = executorService;
-
-		File folder = new File(mapFolderPath + keysoundFolderPath);
-		folder.mkdir();
 	}
 
 	@Override
@@ -35,50 +31,40 @@ public abstract class BaseKeysoundWriter implements KeysoundWriter {
 		boolean registered = keysoundPathProvider
 				.isRegistered(keysoundIdentifier);
 
-		final String path = keysoundPathProvider.getKeysoundPath(
-				keysoundFolderPath, keysoundIdentifier, getExtension());
+		final String keysoundPath = keysoundPathProvider.getKeysoundPath(
+				keysoundIdentifier, getExtension());
 
 		if (!registered) {
 			executorService.execute(new Runnable() {
 
 				@Override
 				public void run() {
-					System.out.println("Writing keysound " + path);
-
-					FileOutputStream os;
+					File keysoundFile = new File(mapsetFolder, keysoundPath);
+					System.out.println("Writing keysound "
+							+ keysoundFile.getPath());
 					try {
-						os = new FileOutputStream(mapFolderPath + path);
+
+						FileOutputStream os;
+						os = new FileOutputStream(keysoundFile);
 						try {
 							writeKeysound(os, data, streamInfo);
 
 						} catch (IOException e) {
-							System.err.println("Failed to write keysound "
-									+ path);
-							e.printStackTrace();
 
 						} finally {
-							try {
-								os.close();
-
-							} catch (IOException e) {
-								System.err
-										.println("Failed to close file for keysound "
-												+ path);
-								e.printStackTrace();
-							}
+							os.close();
 						}
 
-					} catch (FileNotFoundException e) {
-						System.err
-								.println("Failed to open file to write keysound "
-										+ path);
+					} catch (IOException e) {
+						System.err.println("Failed to write keysound "
+								+ keysoundFile.getPath());
 						e.printStackTrace();
 					}
 				}
 			});
 		}
 
-		return path;
+		return keysoundPath;
 	}
 
 	protected abstract String getExtension();

@@ -1,7 +1,8 @@
-package com.damnae.osukeysoundsplitter;
+package com.damnae.osukeysoundsplitter.writer;
 
 import java.io.DataOutput;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -9,13 +10,14 @@ import java.util.concurrent.ExecutorService;
 import org.kc7bfi.jflac.metadata.StreamInfo;
 import org.kc7bfi.jflac.util.LittleEndianDataOutput;
 
+import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
+
 public class WavKeysoundWriter extends BaseKeysoundWriter {
 
-	public WavKeysoundWriter(String mapFolderPath, String keysoundFolderPath,
+	public WavKeysoundWriter(File mapsetFolder,
 			KeysoundPathProvider keysoundPathProvider,
 			ExecutorService executorService) {
-		super(mapFolderPath, keysoundFolderPath, keysoundPathProvider,
-				executorService);
+		super(mapsetFolder, keysoundPathProvider, executorService);
 	}
 
 	@Override

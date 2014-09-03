@@ -11,12 +11,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import com.damnae.osukeysoundsplitter.OsuDiff.DiffEvent;
+import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
+import com.damnae.osukeysoundsplitter.writer.KeysoundWriter;
+import com.damnae.osukeysoundsplitter.writer.OggKeysoundWriter;
 
 public class KeysoundProcessor {
 	private static final long SHORT_AUDIO_AREA_THRESHOLD = 10; // ms
@@ -46,7 +48,7 @@ public class KeysoundProcessor {
 				executorService);
 
 		keysounds.addAll(diffKeysounds);
-		keysoundFiles.add(getKeysoundsFolderPath(keysoundsFile));
+		keysoundFiles.add(Utils.getFileNameWithoutExtension(keysoundsFile));
 
 		return keysoundExtractor;
 	}
@@ -97,29 +99,11 @@ public class KeysoundProcessor {
 			KeysoundPathProvider keysoundPathProvider,
 			ExecutorService executorService) throws IOException {
 
-		KeysoundWriter writer = new OggKeysoundWriter(keysoundsFile
-				.getParentFile().getCanonicalPath() + "/",
-				getKeysoundsFolderPath(keysoundsFile), keysoundPathProvider,
-				executorService);
+		File mapsetFolder = keysoundsFile.getParentFile();
+		KeysoundWriter writer = new OggKeysoundWriter(mapsetFolder,
+				keysoundPathProvider, executorService);
 
 		return new KeysoundExtractor(keysounds, writer, offset);
-	}
-
-	private String getKeysoundsFolderPath(File keysoundsFile)
-			throws IOException {
-
-		String keysoundsPath = keysoundsFile.getCanonicalPath();
-
-		int separatorPos = keysoundsPath.lastIndexOf(File.separator);
-		if (separatorPos < 0)
-			throw new InvalidParameterException(keysoundsPath);
-
-		int extensionPos = keysoundsPath.lastIndexOf('.');
-		if (extensionPos < 0)
-			throw new InvalidParameterException(keysoundsPath);
-
-		return keysoundsPath.substring(separatorPos + File.separator.length(),
-				extensionPos) + "/";
 	}
 
 	private void insertKeysounds(File diffFile, List<Keysound> keysounds,
@@ -233,20 +217,20 @@ public class KeysoundProcessor {
 		final int flags = Integer.parseInt(values[3]);
 
 		if (isNoteOrCircle(flags)) {
-			String[] hitsoundValues = splitValues(values[5], ':');
+			String[] hitsoundValues = Utils.splitValues(values[5], ':');
 			hitsoundValues[3] = String.valueOf(volume);
 			hitsoundValues[4] = keysound.filename;
 
-			values[5] = joinValues(hitsoundValues, ":");
-			keysoundData = joinValues(values, ",");
+			values[5] = Utils.joinValues(hitsoundValues, ":");
+			keysoundData = Utils.joinValues(values, ",");
 
 		} else if (isLongNote(flags)) {
-			String[] lnValues = splitValues(values[5], ':');
+			String[] lnValues = Utils.splitValues(values[5], ':');
 			lnValues[4] = String.valueOf(volume);
 			lnValues[5] = keysound.filename;
 
-			values[5] = joinValues(lnValues, ":");
-			keysoundData = joinValues(values, ",");
+			values[5] = Utils.joinValues(lnValues, ":");
+			keysoundData = Utils.joinValues(values, ",");
 		}
 
 		return keysoundData;
@@ -301,37 +285,5 @@ public class KeysoundProcessor {
 			}
 		}
 		return keepSample;
-	}
-
-	private String[] splitValues(String value, char separator) {
-		int[] indexes = new int[value.length()];
-		int indexCount = 0;
-		for (int i = 0, size = value.length(); i < size; ++i) {
-			char c = value.charAt(i);
-			if (c == separator) {
-				indexes[indexCount] = i;
-				++indexCount;
-			}
-		}
-
-		String[] values = new String[indexCount + 1];
-		values[0] = value.substring(0, indexes[0]);
-		for (int i = 1; i < indexCount; ++i) {
-			values[i] = value.substring(indexes[i - 1] + 1, indexes[i]);
-		}
-		values[values.length - 1] = value.substring(
-				indexes[indexCount - 1] + 1, value.length());
-
-		return values;
-	}
-
-	private String joinValues(String[] hitsoundValues, String separator) {
-		StringBuilder sb = new StringBuilder();
-		for (String hitsoundValue : hitsoundValues) {
-			if (sb.length() > 0)
-				sb.append(separator);
-			sb.append(hitsoundValue);
-		}
-		return sb.toString();
 	}
 }

@@ -1,5 +1,6 @@
-package com.damnae.osukeysoundsplitter;
+package com.damnae.osukeysoundsplitter.writer;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Random;
@@ -15,14 +16,15 @@ import org.xiph.libvorbis.vorbis_dsp_state;
 import org.xiph.libvorbis.vorbis_info;
 import org.xiph.libvorbis.vorbisenc;
 
+import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
+
 public class OggKeysoundWriter extends BaseKeysoundWriter {
 	private static final int SAMPLE_COUNT = 1024;
 
-	public OggKeysoundWriter(String mapFolderPath, String keysoundFolderPath,
+	public OggKeysoundWriter(File mapsetFolder,
 			KeysoundPathProvider keysoundPathProvider,
 			ExecutorService executorService) {
-		super(mapFolderPath, keysoundFolderPath, keysoundPathProvider,
-				executorService);
+		super(mapsetFolder, keysoundPathProvider, executorService);
 	}
 
 	@Override

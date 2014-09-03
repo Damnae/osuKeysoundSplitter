@@ -1,5 +1,6 @@
 package com.damnae.osukeysoundsplitter;
 
+import java.io.File;
 import java.io.IOException;
 
 public class Main {
@@ -11,9 +12,9 @@ public class Main {
 			return;
 		}
 
-		String folderPath = args[0];
+		File folder = new File(args[0]);
 		int offset = Integer.valueOf(args[1]);
 
-		new MapsetProcessor().process(folderPath, offset);
+		new MapsetProcessor().process(folder, offset);
 	}
 }
