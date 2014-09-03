@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.damnae.osukeysoundsplitter.pathprovider.CounterKeysoundPathProvider;
+import com.damnae.osukeysoundsplitter.pathprovider.AdditionsKeysoundPathProvider;
 import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
 
 public class MapsetProcessor {
@@ -45,7 +45,8 @@ public class MapsetProcessor {
 				.max(1, Runtime.getRuntime().availableProcessors() - 1));
 		Map<String, DiffContext> diffContexts = new HashMap<String, DiffContext>();
 
-		KeysoundPathProvider keysoundPathProvider = new CounterKeysoundPathProvider();
+		KeysoundPathProvider keysoundPathProvider = new AdditionsKeysoundPathProvider(
+				100);
 		for (File keysoundTrackFile : keysoundTrackFiles) {
 			String keysoundTrackName = getKeysoundTrackName(keysoundTrackFile);
 			KeysoundTrackDecoder keysoundTrackDecoder = new KeysoundTrackDecoder(

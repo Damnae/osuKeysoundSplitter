@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import com.damnae.osukeysoundsplitter.OsuDiff.DiffEvent;
+import com.damnae.osukeysoundsplitter.pathprovider.AdditionsKeysoundPathProvider;
 import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
 import com.damnae.osukeysoundsplitter.writer.KeysoundWriter;
 import com.damnae.osukeysoundsplitter.writer.OggKeysoundWriter;
@@ -161,19 +162,7 @@ public class KeysoundProcessor {
 
 					} else if (sectionName != null) {
 						if (sectionName.equals("Events")) {
-							if (line.startsWith("Sample")) {
-								String[] values = line.split(",");
-								String samplePath = values[3];
-
-								boolean keepSample = !isSampleInKeysoundFolder(
-										samplePath, keysoundFolderPaths);
-
-								if (keepSample) {
-									writer.append(line);
-									writer.newLine();
-								}
-
-							} else {
+							if (!line.startsWith("Sample")) {
 								writer.append(line);
 								writer.newLine();
 
@@ -218,17 +207,31 @@ public class KeysoundProcessor {
 
 		if (isNoteOrCircle(flags)) {
 			String[] hitsoundValues = Utils.splitValues(values[5], ':');
+			hitsoundValues[0] = String.valueOf(AdditionsKeysoundPathProvider
+					.getAdditionsSampleset(keysound.filename));
+			hitsoundValues[1] = "0";
+			hitsoundValues[2] = String.valueOf(AdditionsKeysoundPathProvider
+					.getSampleType(keysound.filename));
 			hitsoundValues[3] = String.valueOf(volume);
-			hitsoundValues[4] = keysound.filename;
+			hitsoundValues[4] = "";
 
+			values[4] = String.valueOf(AdditionsKeysoundPathProvider
+					.getAdditions(keysound.filename));
 			values[5] = Utils.joinValues(hitsoundValues, ":");
 			keysoundData = Utils.joinValues(values, ",");
 
 		} else if (isLongNote(flags)) {
 			String[] lnValues = Utils.splitValues(values[5], ':');
+			lnValues[1] = String.valueOf(AdditionsKeysoundPathProvider
+					.getAdditionsSampleset(keysound.filename));
+			lnValues[2] = "0";
+			lnValues[3] = String.valueOf(AdditionsKeysoundPathProvider
+					.getSampleType(keysound.filename));
 			lnValues[4] = String.valueOf(volume);
-			lnValues[5] = keysound.filename;
+			lnValues[5] = "";
 
+			values[4] = String.valueOf(AdditionsKeysoundPathProvider
+					.getAdditions(keysound.filename));
 			values[5] = Utils.joinValues(lnValues, ":");
 			keysoundData = Utils.joinValues(values, ",");
 		}
@@ -269,21 +272,5 @@ public class KeysoundProcessor {
 		}
 
 		return lines;
-	}
-
-	private boolean isSampleInKeysoundFolder(String samplePath,
-			List<String> keysoundFolderPaths) {
-
-		boolean keepSample = false;
-		for (String keysoundFolderPath : keysoundFolderPaths) {
-			if (samplePath.startsWith("\"" + keysoundFolderPath)
-					|| samplePath.startsWith("\""
-							+ keysoundFolderPath.replace('/', '\\'))) {
-
-				keepSample = true;
-				break;
-			}
-		}
-		return keepSample;
 	}
 }
