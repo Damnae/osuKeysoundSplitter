@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-import org.kc7bfi.jflac.FLACDecoder;
-
 import com.damnae.osukeysoundsplitter.OsuDiff.DiffEvent;
 
 public class KeysoundProcessor {
@@ -34,20 +32,23 @@ public class KeysoundProcessor {
 	private List<Keysound> keysounds = new ArrayList<Keysound>();
 	private List<String> keysoundFiles = new ArrayList<String>();
 
-	public void process(File diffFile, File keysoundsFile, int offset,
-			KeysoundPathProvider keysoundPathProvider,
+	public KeysoundExtractor process(File diffFile, File keysoundsFile,
+			int offset, KeysoundPathProvider keysoundPathProvider,
 			ExecutorService executorService) throws IOException {
 
 		OsuDiff osuDiff = new OsuDiff(diffFile);
 		List<Keysound> diffKeysounds = getKeysounds(osuDiff);
 		if (diffKeysounds.isEmpty())
-			return;
+			return null;
 
-		extractKeysounds(keysoundsFile, diffKeysounds, offset,
-				keysoundPathProvider, executorService);
+		KeysoundExtractor keysoundExtractor = getKeysoundExtractor(
+				keysoundsFile, diffKeysounds, offset, keysoundPathProvider,
+				executorService);
 
 		keysounds.addAll(diffKeysounds);
 		keysoundFiles.add(getKeysoundsFolderPath(keysoundsFile));
+
+		return keysoundExtractor;
 	}
 
 	public void insertKeysounds(File diffFile) throws IOException {
@@ -91,23 +92,17 @@ public class KeysoundProcessor {
 		return keysounds;
 	}
 
-	private void extractKeysounds(File keysoundsFile, List<Keysound> keysounds,
-			int offset, KeysoundPathProvider keysoundPathProvider,
+	private KeysoundExtractor getKeysoundExtractor(File keysoundsFile,
+			List<Keysound> keysounds, int offset,
+			KeysoundPathProvider keysoundPathProvider,
 			ExecutorService executorService) throws IOException {
 
 		KeysoundWriter writer = new OggKeysoundWriter(keysoundsFile
 				.getParentFile().getCanonicalPath() + "/",
 				getKeysoundsFolderPath(keysoundsFile), keysoundPathProvider,
 				executorService);
-		KeysoundExtractor keysoundExtractor = new KeysoundExtractor(keysounds,
-				writer, offset);
 
-		FileInputStream is = new FileInputStream(keysoundsFile);
-		FLACDecoder decoder = new FLACDecoder(is);
-		decoder.addPCMProcessor(keysoundExtractor);
-		decoder.decode();
-
-		keysoundExtractor.complete();
+		return new KeysoundExtractor(keysounds, writer, offset);
 	}
 
 	private String getKeysoundsFolderPath(File keysoundsFile)
