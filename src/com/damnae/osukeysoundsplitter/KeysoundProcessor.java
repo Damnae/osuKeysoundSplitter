@@ -125,10 +125,19 @@ public class KeysoundProcessor {
 	private void insertKeysounds(File diffFile, List<Keysound> keysounds,
 			List<String> keysoundFolderPaths) throws IOException {
 
+		// The file is assume to exist at this point
 		File backupFile = new File(diffFile.getCanonicalPath() + ".bak");
-		if (backupFile.exists())
-			backupFile.delete();
-		Files.copy(diffFile.toPath(), backupFile.toPath());
+		if (diffFile.length() == 0) {
+			System.out.println("diff file is empty, restoring from backup");
+
+			diffFile.delete();
+			Files.copy(backupFile.toPath(), diffFile.toPath());
+
+		} else {
+			if (backupFile.exists())
+				backupFile.delete();
+			Files.copy(diffFile.toPath(), backupFile.toPath());
+		}
 
 		List<String> lines = retrieveLines(diffFile);
 		FileOutputStream os = new FileOutputStream(diffFile);
