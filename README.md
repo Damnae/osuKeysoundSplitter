@@ -10,17 +10,16 @@
 * Make a copy of the diff and make it use the complete song's mp3. The name of diff should be suffixed with the flac name: if your diff is called `NM`, and the flac `voice.flac`, call this diff `NM -voice`.
 * Place notes over the voice on this diff.
 * Place bookmarks where the voice parts start and end, each pair of bookmarks describe a section that will have keysounds. Bookmarks can also be used to cut breathing sounds from the notes, see how they are placed in [this map](https://osu.ppy.sh/s/208734).
-* Edit the path to the mapset in Main.java:
+* Place keysound.bat and the jar in the mapset's folder and run keysound.bat. You can also use this command:
 ```
-public static final String FOLDER_PATH = "C:/Games/osu!/Songs/208734 SNoW - NightmaRe/";
+java -jar "osu!KeysoundSplitter.jar" mapsetPath keysoundsOffsetInMilliseconds
 ```
-* Run!
 
 ## FAQTS
 
  * Yes, it works with any audio track, it doesn't have to be voice.
  * Yes, you can have multiple keysound sources in the same map by having multiple flac and multiple diffs, each suffixed by one of the flac name: Diffs named `NM -voice`, `NM -guitar` with `voice.flac` and `guitar.flac` will be combined into `NM`.
  * No, it doesn't separate different instruments from a complete song for you.
- * No, there's no user interface and no .jar yet. You have to compile it and run it.
+ * No, there's no user interface yet.
  * No, it's only for .osu files, so no .bme.
  * No, it doesn't work with sliders yet; osu! doesn't support the way I insert hitsounds in an .osu when it's a slider.

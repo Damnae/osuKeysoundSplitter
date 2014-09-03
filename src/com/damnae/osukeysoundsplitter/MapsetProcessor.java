@@ -23,6 +23,7 @@ public class MapsetProcessor {
 		long startTime = System.nanoTime();
 
 		File folder = new File(folderPath);
+		System.out.println("Processing mapset in " + folder.getCanonicalPath());
 
 		File[] keysoundTrackFiles = folder.listFiles(new FilenameFilter() {
 			@Override
