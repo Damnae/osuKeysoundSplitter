@@ -106,7 +106,9 @@ public class OsuDiff {
 
 			boolean isSimultaneous = false;
 			for (DiffEvent diffEvent : diffEvents) {
-				if (diffEvent.time == startTime && diffEvent.data != null) {
+				if (Math.abs(diffEvent.time - startTime) <= 2
+						&& diffEvent.data != null) {
+
 					diffEvent.data += "\n" + line;
 					isSimultaneous = true;
 					break;
