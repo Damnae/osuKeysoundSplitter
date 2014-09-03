@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -234,6 +235,31 @@ public class KeysoundProcessor {
 					.getAdditions(keysound.filename));
 			values[5] = Utils.joinValues(lnValues, ":");
 			keysoundData = Utils.joinValues(values, ",");
+
+		} else if (isSlider(flags)) {
+			if (values.length < 10)
+				values = Arrays.copyOf(values, 10);
+
+			final int nodeCount = Integer.parseInt(values[6]) + 1;
+
+			String[] additionValues = new String[nodeCount];
+			additionValues[0] = String.valueOf(AdditionsKeysoundPathProvider
+					.getAdditions(keysound.filename));
+			for (int i = 1; i < nodeCount; ++i)
+				additionValues[i] = "0";
+
+			String[] sampleTypeValues = new String[nodeCount];
+			sampleTypeValues[0] = String.valueOf(AdditionsKeysoundPathProvider
+					.getAdditionsSampleset(keysound.filename)) + ":0";
+			for (int i = 1; i < nodeCount; ++i)
+				sampleTypeValues[i] = "0:0";
+
+			values[8] = Utils.joinValues(additionValues, "|");
+			values[9] = Utils.joinValues(sampleTypeValues, "|");
+			keysoundData = Utils.joinValues(values, ",");
+
+		} else if (isSpinner(flags)) {
+
 		}
 
 		return keysoundData;
@@ -245,6 +271,14 @@ public class KeysoundProcessor {
 
 	private boolean isLongNote(int flags) {
 		return (flags & 128) != 0;
+	}
+
+	private boolean isSlider(int flags) {
+		return (flags & 2) != 0;
+	}
+
+	private boolean isSpinner(int flags) {
+		return (flags & 8) != 0;
 	}
 
 	private List<String> retrieveLines(File file) throws FileNotFoundException,
