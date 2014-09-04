@@ -11,11 +11,9 @@ import com.damnae.osukeysoundsplitter.Utils;
 import com.damnae.osukeysoundsplitter.pathprovider.HitnormalKeysoundPathProvider;
 
 public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
-	private int initialSampleType;
 
 	public StandardKeysoundingStrategy(int initialSampleType) {
 		super(new HitnormalKeysoundPathProvider(initialSampleType));
-		this.initialSampleType = initialSampleType;
 	}
 
 	@Override
@@ -92,6 +90,58 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 		return buildTimingPointLines(timingPoints);
 	}
 
+	private List<TimingPoint> parseTimingPoints(List<String> timingPointLines) {
+		List<TimingPoint> timingPoints = new ArrayList<TimingPoint>(
+				timingPointLines.size());
+	
+		double previousNonInheritedBeatDuration = 0;
+		for (String timingPointLine : timingPointLines) {
+			String[] values = timingPointLine.split(",");
+	
+			if (values.length < 2)
+				throw new RuntimeException(
+						"Timing point has less than the 2 values: "
+								+ timingPointLine);
+	
+			TimingPoint timingPoint = new TimingPoint();
+			timingPoint.time = Long.parseLong(values[0]);
+			timingPoint.secondValue = Double.parseDouble(values[1]);
+			timingPoint.beatPerMeasure = values.length > 2 ? Integer
+					.parseInt(values[2]) : 4;
+			timingPoint.sampleType = values.length > 3 ? Integer
+					.parseInt(values[3]) : 1;
+			timingPoint.sampleSet = values.length > 4 ? Integer
+					.parseInt(values[4]) : 1;
+			timingPoint.volume = values.length > 5 ? Integer
+					.parseInt(values[5]) : 100;
+			timingPoint.isInherited = values.length > 6 ? Integer
+					.parseInt(values[6]) == 0 : false;
+			timingPoint.isKiai = values.length > 7 ? Integer
+					.parseInt(values[7]) != 0 : false;
+	
+			if (timingPoint.isInherited) {
+				timingPoint.prevousBeatDuration = previousNonInheritedBeatDuration;
+	
+			} else {
+				previousNonInheritedBeatDuration = timingPoint.secondValue;
+			}
+			timingPoints.add(timingPoint);
+		}
+	
+		sortTimingPoints(timingPoints);
+	
+		return timingPoints;
+	}
+
+	private void removeKeysounding(List<TimingPoint> timingPoints) {
+		for (TimingPoint timingPoint : timingPoints) {
+			timingPoint.sampleType = 2;
+			timingPoint.sampleSet = 0;
+			timingPoint.volume = 100;
+		}
+		simplifyTimingPoints(timingPoints);
+	}
+
 	private void insertKeysounds(List<TimingPoint> timingPoints,
 			List<Keysound> keysounds) {
 
@@ -129,28 +179,14 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 		simplifyTimingPoints(timingPoints);
 	}
 
-	private TimingPoint getOrCreateTimingPoint(List<TimingPoint> timingPoints,
-			long time) {
-
-		TimingPoint timingPoint = Utils
-				.getTimingPointAtTime(timingPoints, time);
-
-		if (Math.abs(timingPoint.time - time) > 1) {
-			timingPoint = timingPoint.createInherited(time);
-			timingPoints.add(timingPoint);
-		}
-		sortTimingPoints(timingPoints);
-
-		return timingPoint;
-	}
-
-	private void removeKeysounding(List<TimingPoint> timingPoints) {
-		for (TimingPoint timingPoint : timingPoints) {
-			timingPoint.sampleType = 2;
-			timingPoint.sampleSet = 0;
-			timingPoint.volume = 100;
-		}
-		simplifyTimingPoints(timingPoints);
+	private List<String> buildTimingPointLines(List<TimingPoint> timingPoints) {
+		List<String> timingPointLines = new ArrayList<String>(
+				timingPoints.size());
+	
+		for (TimingPoint timingPoint : timingPoints)
+			timingPointLines.add(timingPoint.toString());
+	
+		return timingPointLines;
 	}
 
 	private void simplifyTimingPoints(List<TimingPoint> timingPoints) {
@@ -173,47 +209,19 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 		}
 	}
 
-	private List<TimingPoint> parseTimingPoints(List<String> timingPointLines) {
-		List<TimingPoint> timingPoints = new ArrayList<TimingPoint>(
-				timingPointLines.size());
-
-		double previousNonInheritedBeatDuration = 0;
-		for (String timingPointLine : timingPointLines) {
-			String[] values = timingPointLine.split(",");
-
-			if (values.length < 2)
-				throw new RuntimeException(
-						"Timing point has less than the 2 values: "
-								+ timingPointLine);
-
-			TimingPoint timingPoint = new TimingPoint();
-			timingPoint.time = Long.parseLong(values[0]);
-			timingPoint.secondValue = Double.parseDouble(values[1]);
-			timingPoint.beatPerMeasure = values.length > 2 ? Integer
-					.parseInt(values[2]) : 4;
-			timingPoint.sampleType = values.length > 3 ? Integer
-					.parseInt(values[3]) : 1;
-			timingPoint.sampleSet = values.length > 4 ? Integer
-					.parseInt(values[4]) : 1;
-			timingPoint.volume = values.length > 5 ? Integer
-					.parseInt(values[5]) : 100;
-			timingPoint.isInherited = values.length > 6 ? Integer
-					.parseInt(values[6]) == 0 : false;
-			timingPoint.isKiai = values.length > 7 ? Integer
-					.parseInt(values[7]) != 0 : false;
-
-			if (timingPoint.isInherited) {
-				timingPoint.prevousBeatDuration = previousNonInheritedBeatDuration;
-
-			} else {
-				previousNonInheritedBeatDuration = timingPoint.secondValue;
-			}
+	private TimingPoint getOrCreateTimingPoint(List<TimingPoint> timingPoints,
+			long time) {
+	
+		TimingPoint timingPoint = Utils
+				.getTimingPointAtTime(timingPoints, time);
+	
+		if (Math.abs(timingPoint.time - time) > 1) {
+			timingPoint = timingPoint.createInherited(time);
 			timingPoints.add(timingPoint);
 		}
-
 		sortTimingPoints(timingPoints);
-
-		return timingPoints;
+	
+		return timingPoint;
 	}
 
 	private void sortTimingPoints(List<TimingPoint> timingPoints) {
@@ -227,16 +235,6 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 				return value;
 			}
 		});
-	}
-
-	private List<String> buildTimingPointLines(List<TimingPoint> timingPoints) {
-		List<String> timingPointLines = new ArrayList<String>(
-				timingPoints.size());
-
-		for (TimingPoint timingPoint : timingPoints)
-			timingPointLines.add(timingPoint.toString());
-
-		return timingPointLines;
 	}
 
 	public static class TimingPoint {

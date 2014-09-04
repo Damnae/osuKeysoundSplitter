@@ -19,7 +19,7 @@ java -jar "osu!KeysoundSplitter.jar" mapsetPath keysoundsOffsetInMilliseconds
 
  * Yes, it works with any audio track, it doesn't have to be voice.
  * Yes, you can have multiple keysound sources in the same map by having multiple flac and multiple diffs, each suffixed by one of the flac name: Diffs named `NM -voice`, `NM -guitar` with `voice.flac` and `guitar.flac` will be combined into `NM`.
+ * It works with standard and mania for now.
  * No, it doesn't separate different instruments from a complete song for you.
  * No, there's no user interface yet.
  * No, it's only for .osu files, so no .bme.
- * No, it doesn't work with sliders yet; osu! doesn't support the way I insert hitsounds in an .osu when it's a slider.
