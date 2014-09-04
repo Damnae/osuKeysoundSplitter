@@ -12,12 +12,10 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import com.damnae.osukeysoundsplitter.OsuDiff.DiffEvent;
-import com.damnae.osukeysoundsplitter.pathprovider.AdditionsKeysoundPathProvider;
 import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
 import com.damnae.osukeysoundsplitter.writer.KeysoundWriter;
 import com.damnae.osukeysoundsplitter.writer.OggKeysoundWriter;
@@ -25,7 +23,7 @@ import com.damnae.osukeysoundsplitter.writer.OggKeysoundWriter;
 public class KeysoundProcessor {
 	private static final long SHORT_AUDIO_AREA_THRESHOLD = 10; // ms
 
-	class Keysound {
+	public static class Keysound {
 		public String filename;
 		public long startTime;
 		public long endTime;
@@ -156,8 +154,9 @@ public class KeysoundProcessor {
 										.split("\n");
 								int volume = 133 / keysoundDataLines.length;
 								for (String keysoundData : keysoundDataLines) {
-									writer.append(rewriteKeysoundData(keysound,
-											keysoundData, volume));
+									writer.append(keysoundingStrategy
+											.rewriteKeysoundData(keysound,
+													keysoundData, volume));
 									writer.newLine();
 								}
 							}
@@ -200,87 +199,6 @@ public class KeysoundProcessor {
 		} finally {
 			os.close();
 		}
-	}
-
-	private CharSequence rewriteKeysoundData(Keysound keysound,
-			String keysoundData, int volume) {
-
-		String[] values = keysoundData.split(",");
-		final int flags = Integer.parseInt(values[3]);
-
-		if (isNoteOrCircle(flags)) {
-			String[] hitsoundValues = Utils.splitValues(values[5], ':');
-			hitsoundValues[0] = String.valueOf(AdditionsKeysoundPathProvider
-					.getAdditionsSampleset(keysound.filename));
-			hitsoundValues[1] = "0";
-			hitsoundValues[2] = String.valueOf(AdditionsKeysoundPathProvider
-					.getSampleType(keysound.filename));
-			hitsoundValues[3] = String.valueOf(volume);
-			hitsoundValues[4] = "";
-
-			values[4] = String.valueOf(AdditionsKeysoundPathProvider
-					.getAdditions(keysound.filename));
-			values[5] = Utils.joinValues(hitsoundValues, ":");
-			keysoundData = Utils.joinValues(values, ",");
-
-		} else if (isLongNote(flags)) {
-			String[] lnValues = Utils.splitValues(values[5], ':');
-			lnValues[1] = String.valueOf(AdditionsKeysoundPathProvider
-					.getAdditionsSampleset(keysound.filename));
-			lnValues[2] = "0";
-			lnValues[3] = String.valueOf(AdditionsKeysoundPathProvider
-					.getSampleType(keysound.filename));
-			lnValues[4] = String.valueOf(volume);
-			lnValues[5] = "";
-
-			values[4] = String.valueOf(AdditionsKeysoundPathProvider
-					.getAdditions(keysound.filename));
-			values[5] = Utils.joinValues(lnValues, ":");
-			keysoundData = Utils.joinValues(values, ",");
-
-		} else if (isSlider(flags)) {
-			if (values.length < 10)
-				values = Arrays.copyOf(values, 10);
-
-			final int nodeCount = Integer.parseInt(values[6]) + 1;
-
-			String[] additionValues = new String[nodeCount];
-			additionValues[0] = String.valueOf(AdditionsKeysoundPathProvider
-					.getAdditions(keysound.filename));
-			for (int i = 1; i < nodeCount; ++i)
-				additionValues[i] = "0";
-
-			String[] sampleTypeValues = new String[nodeCount];
-			sampleTypeValues[0] = String.valueOf(AdditionsKeysoundPathProvider
-					.getAdditionsSampleset(keysound.filename)) + ":0";
-			for (int i = 1; i < nodeCount; ++i)
-				sampleTypeValues[i] = "0:0";
-
-			values[8] = Utils.joinValues(additionValues, "|");
-			values[9] = Utils.joinValues(sampleTypeValues, "|");
-			keysoundData = Utils.joinValues(values, ",");
-
-		} else if (isSpinner(flags)) {
-
-		}
-
-		return keysoundData;
-	}
-
-	private boolean isNoteOrCircle(int flags) {
-		return (flags & 1) != 0;
-	}
-
-	private boolean isLongNote(int flags) {
-		return (flags & 128) != 0;
-	}
-
-	private boolean isSlider(int flags) {
-		return (flags & 2) != 0;
-	}
-
-	private boolean isSpinner(int flags) {
-		return (flags & 8) != 0;
 	}
 
 	private List<String> retrieveLines(File file) throws FileNotFoundException,

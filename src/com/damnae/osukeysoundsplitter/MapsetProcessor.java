@@ -49,8 +49,12 @@ public class MapsetProcessor {
 				.max(1, Runtime.getRuntime().availableProcessors() - 1));
 
 		Map<String, DiffContext> diffContexts = new HashMap<String, DiffContext>();
+
 		KeysoundingStrategy keysoundingStrategy = new StandardKeysoundingStrategy(
 				100);
+		// KeysoundingStrategy keysoundingStrategy = new
+		// ManiaKeysoundingStrategy(
+		// "ks");
 
 		for (File keysoundTrackFile : keysoundTrackFiles) {
 			String keysoundTrackName = getKeysoundTrackName(keysoundTrackFile);

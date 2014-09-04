@@ -44,6 +44,8 @@ public abstract class BaseKeysoundWriter implements KeysoundWriter {
 				@Override
 				public void run() {
 					File keysoundFile = new File(mapsetFolder, keysoundPath);
+					keysoundFile.getParentFile().mkdirs();
+
 					System.out.println("Writing keysound "
 							+ keysoundFile.getPath());
 					try {
