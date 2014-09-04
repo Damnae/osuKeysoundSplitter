@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutorService;
 
 import com.damnae.osukeysoundsplitter.OsuDiff.DiffEvent;
 import com.damnae.osukeysoundsplitter.pathprovider.AdditionsKeysoundPathProvider;
-import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
+import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
 import com.damnae.osukeysoundsplitter.writer.KeysoundWriter;
 import com.damnae.osukeysoundsplitter.writer.OggKeysoundWriter;
 
@@ -33,12 +33,16 @@ public class KeysoundProcessor {
 		public String data;
 	}
 
+	private KeysoundingStrategy keysoundingStrategy;
 	private List<Keysound> keysounds = new ArrayList<Keysound>();
 	private List<String> keysoundFiles = new ArrayList<String>();
 
+	public KeysoundProcessor(KeysoundingStrategy keysoundingStrategy) {
+		this.keysoundingStrategy = keysoundingStrategy;
+	}
+
 	public KeysoundExtractor process(File diffFile, File keysoundsFile,
-			int offset, KeysoundPathProvider keysoundPathProvider,
-			ExecutorService executorService) throws IOException {
+			int offset, ExecutorService executorService) throws IOException {
 
 		OsuDiff osuDiff = new OsuDiff(diffFile);
 		List<Keysound> diffKeysounds = getKeysounds(osuDiff);
@@ -46,8 +50,7 @@ public class KeysoundProcessor {
 			return null;
 
 		KeysoundExtractor keysoundExtractor = getKeysoundExtractor(
-				keysoundsFile, diffKeysounds, offset, keysoundPathProvider,
-				executorService);
+				keysoundsFile, diffKeysounds, offset, executorService);
 
 		keysounds.addAll(diffKeysounds);
 		keysoundFiles.add(Utils.getFileNameWithoutExtension(keysoundsFile));
@@ -98,12 +101,11 @@ public class KeysoundProcessor {
 
 	private KeysoundExtractor getKeysoundExtractor(File keysoundsFile,
 			List<Keysound> keysounds, int offset,
-			KeysoundPathProvider keysoundPathProvider,
 			ExecutorService executorService) throws IOException {
 
 		File mapsetFolder = keysoundsFile.getParentFile();
 		KeysoundWriter writer = new OggKeysoundWriter(mapsetFolder,
-				keysoundPathProvider, executorService);
+				keysoundingStrategy, executorService);
 
 		return new KeysoundExtractor(keysounds, writer, offset);
 	}

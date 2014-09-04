@@ -8,24 +8,28 @@ import java.util.concurrent.ExecutorService;
 import org.kc7bfi.jflac.metadata.StreamInfo;
 
 import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
+import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
 
 public abstract class BaseKeysoundWriter implements KeysoundWriter {
 	private File mapsetFolder;
-	private KeysoundPathProvider keysoundPathProvider;
+	private KeysoundingStrategy keysoundingStrategy;
 	private ExecutorService executorService;
 
 	public BaseKeysoundWriter(File mapsetFolder,
-			KeysoundPathProvider keysoundPathProvider,
+			KeysoundingStrategy keysoundingStrategy,
 			ExecutorService executorService) {
 
 		this.mapsetFolder = mapsetFolder;
-		this.keysoundPathProvider = keysoundPathProvider;
+		this.keysoundingStrategy = keysoundingStrategy;
 		this.executorService = executorService;
 	}
 
 	@Override
 	public String writeKeysound(final byte[] data, final StreamInfo streamInfo)
 			throws IOException {
+
+		KeysoundPathProvider keysoundPathProvider = keysoundingStrategy
+				.getKeysoundPathProvider();
 
 		String keysoundIdentifier = keysoundPathProvider.getIdentifier(data);
 		boolean registered = keysoundPathProvider

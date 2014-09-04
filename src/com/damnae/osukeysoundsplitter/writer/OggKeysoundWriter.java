@@ -16,15 +16,15 @@ import org.xiph.libvorbis.vorbis_dsp_state;
 import org.xiph.libvorbis.vorbis_info;
 import org.xiph.libvorbis.vorbisenc;
 
-import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
+import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
 
 public class OggKeysoundWriter extends BaseKeysoundWriter {
 	private static final int SAMPLE_COUNT = 1024;
 
 	public OggKeysoundWriter(File mapsetFolder,
-			KeysoundPathProvider keysoundPathProvider,
+			KeysoundingStrategy keysoundingStrategy,
 			ExecutorService executorService) {
-		super(mapsetFolder, keysoundPathProvider, executorService);
+		super(mapsetFolder, keysoundingStrategy, executorService);
 	}
 
 	@Override

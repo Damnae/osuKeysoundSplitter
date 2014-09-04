@@ -10,14 +10,14 @@ import java.util.concurrent.ExecutorService;
 import org.kc7bfi.jflac.metadata.StreamInfo;
 import org.kc7bfi.jflac.util.LittleEndianDataOutput;
 
-import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
+import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
 
 public class WavKeysoundWriter extends BaseKeysoundWriter {
 
 	public WavKeysoundWriter(File mapsetFolder,
-			KeysoundPathProvider keysoundPathProvider,
+			KeysoundingStrategy keysoundingStrategy,
 			ExecutorService executorService) {
-		super(mapsetFolder, keysoundPathProvider, executorService);
+		super(mapsetFolder, keysoundingStrategy, executorService);
 	}
 
 	@Override

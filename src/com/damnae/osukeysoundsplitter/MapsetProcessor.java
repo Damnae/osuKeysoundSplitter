@@ -10,8 +10,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.damnae.osukeysoundsplitter.pathprovider.AdditionsKeysoundPathProvider;
-import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
+import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
+import com.damnae.osukeysoundsplitter.strategy.StandardKeysoundingStrategy;
 
 public class MapsetProcessor {
 
@@ -19,7 +19,11 @@ public class MapsetProcessor {
 	private static final String DIFF_FILE_EXTENSION = ".osu";
 
 	private class DiffContext {
-		public KeysoundProcessor keysoundProcessor = new KeysoundProcessor();
+		public KeysoundProcessor keysoundProcessor;
+
+		public DiffContext(KeysoundingStrategy keysoundingStrategy) {
+			keysoundProcessor = new KeysoundProcessor(keysoundingStrategy);
+		}
 	}
 
 	public void process(File folder, int offset) throws IOException {
@@ -43,10 +47,11 @@ public class MapsetProcessor {
 
 		ExecutorService executorService = Executors.newFixedThreadPool(Math
 				.max(1, Runtime.getRuntime().availableProcessors() - 1));
-		Map<String, DiffContext> diffContexts = new HashMap<String, DiffContext>();
 
-		KeysoundPathProvider keysoundPathProvider = new AdditionsKeysoundPathProvider(
+		Map<String, DiffContext> diffContexts = new HashMap<String, DiffContext>();
+		KeysoundingStrategy keysoundingStrategy = new StandardKeysoundingStrategy(
 				100);
+
 		for (File keysoundTrackFile : keysoundTrackFiles) {
 			String keysoundTrackName = getKeysoundTrackName(keysoundTrackFile);
 			KeysoundTrackDecoder keysoundTrackDecoder = new KeysoundTrackDecoder(
@@ -62,7 +67,7 @@ public class MapsetProcessor {
 						diffName.length() - suffix.length()).trim();
 				DiffContext context = diffContexts.get(contextName);
 				if (context == null) {
-					context = new DiffContext();
+					context = new DiffContext(keysoundingStrategy);
 					diffContexts.put(contextName, context);
 				}
 
@@ -72,7 +77,7 @@ public class MapsetProcessor {
 
 				KeysoundExtractor keysoundExtractor = context.keysoundProcessor
 						.process(diffFile, keysoundTrackFile, offset,
-								keysoundPathProvider, executorService);
+								executorService);
 
 				keysoundTrackDecoder.register(keysoundExtractor);
 			}
