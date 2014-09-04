@@ -145,17 +145,10 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 	}
 
 	private void removeKeysounding(List<TimingPoint> timingPoints) {
-		int previousSampleType = 2;
-		int previousSampleSet = 0;
 		for (TimingPoint timingPoint : timingPoints) {
-			if (timingPoint.sampleType >= initialSampleType) {
-				timingPoint.sampleType = previousSampleType;
-				timingPoint.sampleSet = previousSampleSet;
-
-			} else {
-				previousSampleType = timingPoint.sampleType;
-				previousSampleSet = timingPoint.sampleSet;
-			}
+			timingPoint.sampleType = 2;
+			timingPoint.sampleSet = 0;
+			timingPoint.volume = 100;
 		}
 		simplifyTimingPoints(timingPoints);
 	}
