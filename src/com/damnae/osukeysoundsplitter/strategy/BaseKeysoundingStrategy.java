@@ -23,20 +23,4 @@ public abstract class BaseKeysoundingStrategy implements KeysoundingStrategy {
 
 		return timingPointLines;
 	}
-
-	protected boolean isNoteOrCircle(int flags) {
-		return (flags & 1) != 0;
-	}
-
-	protected boolean isLongNote(int flags) {
-		return (flags & 128) != 0;
-	}
-
-	protected boolean isSlider(int flags) {
-		return (flags & 2) != 0;
-	}
-
-	protected boolean isSpinner(int flags) {
-		return (flags & 8) != 0;
-	}
 }

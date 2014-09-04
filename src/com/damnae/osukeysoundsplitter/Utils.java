@@ -1,6 +1,9 @@
 package com.damnae.osukeysoundsplitter;
 
 import java.io.File;
+import java.util.List;
+
+import com.damnae.osukeysoundsplitter.strategy.StandardKeysoundingStrategy.TimingPoint;
 
 public class Utils {
 
@@ -42,5 +45,40 @@ public class Utils {
 			sb.append(hitsoundValue);
 		}
 		return sb.toString();
+	}
+
+	public static TimingPoint getTimingPointAtTime(
+			List<TimingPoint> timingPoints, double time) {
+
+		if (timingPoints == null || timingPoints.size() == 0)
+			return null;
+
+		TimingPoint currentTimingPoint = timingPoints.get(0);
+		for (TimingPoint timingsPoint : timingPoints) {
+			if (timingsPoint.time - 1 < time) {
+				currentTimingPoint = timingsPoint;
+
+			} else {
+				break;
+			}
+		}
+
+		return currentTimingPoint;
+	}
+
+	public static boolean isNoteOrCircle(int flags) {
+		return (flags & 1) != 0;
+	}
+
+	public static boolean isLongNote(int flags) {
+		return (flags & 128) != 0;
+	}
+
+	public static boolean isSlider(int flags) {
+		return (flags & 2) != 0;
+	}
+
+	public static boolean isSpinner(int flags) {
+		return (flags & 8) != 0;
 	}
 }
