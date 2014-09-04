@@ -126,6 +126,7 @@ public class KeysoundProcessor {
 		}
 
 		List<String> lines = retrieveLines(diffFile);
+		List<String> timingPointLines = new ArrayList<String>();
 		FileOutputStream os = new FileOutputStream(diffFile);
 		try {
 			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(os,
@@ -136,10 +137,24 @@ public class KeysoundProcessor {
 			try {
 				for (int i = 0, size = lines.size(); i < size; ++i) {
 					String line = lines.get(i);
-					if (line.length() == 0)
+					if (line.length() == 0 && sectionName != null) {
+						// Leave section
+						if (sectionName.equals("TimingPoints")) {
+							timingPointLines = keysoundingStrategy
+									.rewriteTimingPoints(timingPointLines,
+											keysounds);
+
+							for (String timingPointLine : timingPointLines) {
+								writer.append(timingPointLine);
+								writer.newLine();
+							}
+						}
+
 						sectionName = null;
+					}
 
 					if (line.startsWith("[") && line.endsWith("]")) {
+						// Enter section
 						sectionName = line.substring(1, line.length() - 1);
 
 						writer.append(line);
@@ -163,6 +178,7 @@ public class KeysoundProcessor {
 						}
 
 					} else if (sectionName != null) {
+						// Inside a section
 						if (sectionName.equals("Events")) {
 							if (!line.startsWith("Sample")) {
 								writer.append(line);
@@ -181,12 +197,16 @@ public class KeysoundProcessor {
 								}
 							}
 
+						} else if (sectionName.equals("TimingPoints")) {
+							timingPointLines.add(line);
+
 						} else if (!sectionName.equals("HitObjects")) {
 							writer.append(line);
 							writer.newLine();
 						}
 
 					} else {
+						// Outside any section
 						writer.append(line);
 						writer.newLine();
 					}
