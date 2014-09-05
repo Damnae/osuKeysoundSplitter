@@ -33,6 +33,12 @@ public class HitnormalKeysoundPathProvider extends BaseKeysoundPathProvider {
 		}
 	}
 
+	protected boolean isPathValid(String keysoundPath) {
+		return !keysoundPath.contains("/") && !keysoundPath.contains("\\")
+				&& keysoundPath.contains("-hitnormal")
+				&& getSampleType(keysoundPath) != 0;
+	}
+
 	public static int getSampleSet(String path) {
 		int endPosition = path.lastIndexOf('.');
 		for (int i = endPosition - 1; i >= 0; --i) {

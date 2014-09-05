@@ -149,9 +149,6 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 				continue;
 			}
 
-			if (keysound.filename == null)
-				continue;
-
 			long startTime = keysound.startTime;
 			long endTime = keysound.endTime;
 

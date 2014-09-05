@@ -39,13 +39,19 @@ public class AdditionsKeysoundPathProvider extends BaseKeysoundPathProvider {
 		}
 	}
 
+	protected boolean isPathValid(String keysoundPath) {
+		return !keysoundPath.contains("/") && !keysoundPath.contains("\\")
+				&& keysoundPath.contains("-hit")
+				&& getSampleType(keysoundPath) != 0
+				&& getAdditions(keysoundPath) != 0;
+	}
+
 	public static int getSampleSet(String path) {
 		int endPosition = path.lastIndexOf('.');
 		for (int i = endPosition - 1; i >= 0; --i) {
 			char c = path.charAt(i);
 			if (!(c >= '0' && c <= '9'))
 				return Integer.valueOf(path.substring(i + 1, endPosition));
-
 		}
 		return 0;
 	}
@@ -69,4 +75,5 @@ public class AdditionsKeysoundPathProvider extends BaseKeysoundPathProvider {
 	private static String[] sampleTypeNames = { "normal", "soft", "drum" };
 	private static String[] additionNames = { "whistle", "finish", "clap" };
 	private static int[] additionCodes = { 2, 4, 8 };
+
 }

@@ -43,6 +43,9 @@ public abstract class BaseKeysoundPathProvider implements KeysoundPathProvider {
 	public String getKeysoundPath(String keysoundIdentifier, String extension) {
 		String keysoundPath = keysoundCache.getKeysoundPath(keysoundIdentifier);
 
+		if (keysoundPath != null && !isPathValid(keysoundPath))
+			keysoundPath = null;
+
 		if (keysoundPath == null) {
 			while (keysoundPath == null
 					|| keysoundCache.isPathRegistered(keysoundPath)) {
@@ -53,6 +56,10 @@ public abstract class BaseKeysoundPathProvider implements KeysoundPathProvider {
 		}
 
 		return keysoundPath;
+	}
+
+	protected boolean isPathValid(String keysoundPath) {
+		return true;
 	}
 
 	protected abstract String getNewKeysoundPath(String extension);
