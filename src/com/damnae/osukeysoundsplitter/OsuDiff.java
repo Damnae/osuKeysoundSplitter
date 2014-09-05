@@ -16,9 +16,14 @@ public class OsuDiff {
 	public class DiffEvent {
 		public long time;
 		public String data;
+		public boolean isHitObject;
+
+		public boolean isLine() {
+			return isHitObject && data == null;
+		}
 
 		public boolean isSplittingPoint() {
-			return data == null;
+			return !isHitObject && data == null;
 		}
 
 		@Override
@@ -28,6 +33,8 @@ public class OsuDiff {
 	}
 
 	public List<DiffEvent> diffEvents = new ArrayList<DiffEvent>();
+	private List<TimingPoint> timingPoints = new ArrayList<TimingPoint>();
+	private double sliderMultiplier;
 
 	public OsuDiff(File file) throws IOException {
 		FileInputStream is = new FileInputStream(file);
@@ -44,6 +51,12 @@ public class OsuDiff {
 
 					if (sectionName.equals("Editor")) {
 						parseOsuEditorSection(reader);
+
+					} else if (sectionName.equals("Difficulty")) {
+						parseOsuDifficultySection(reader);
+
+					} else if (sectionName.equals("TimingPoints")) {
+						parseOsuTimingPointsSection(reader);
 
 					} else if (sectionName.equals("HitObjects")) {
 						parseOsuHitObjectsSection(reader);
@@ -68,6 +81,29 @@ public class OsuDiff {
 		});
 	}
 
+	private void parseOsuTimingPointsSection(BufferedReader reader)
+			throws IOException {
+
+		double previousNonInheritedBeatDuration = 0;
+
+		String line;
+		while ((line = reader.readLine()) != null) {
+			line = line.trim();
+			if (line.isEmpty())
+				break;
+
+			TimingPoint timingPoint = Utils.parseTimingPoint(line,
+					previousNonInheritedBeatDuration);
+
+			if (!timingPoint.isInherited)
+				previousNonInheritedBeatDuration = timingPoint.secondValue;
+
+			timingPoints.add(timingPoint);
+		}
+
+		Utils.sortTimingPoints(timingPoints);
+	}
+
 	private void parseOsuEditorSection(BufferedReader reader)
 			throws IOException {
 
@@ -86,8 +122,27 @@ public class OsuDiff {
 				for (String bookmark : bookmarks) {
 					DiffEvent diffEvent = new DiffEvent();
 					diffEvent.time = Integer.valueOf(bookmark);
+					diffEvent.isHitObject = false;
 					diffEvents.add(diffEvent);
 				}
+			}
+		}
+	}
+
+	private void parseOsuDifficultySection(BufferedReader reader)
+			throws IOException {
+
+		String line;
+		while ((line = reader.readLine()) != null) {
+			line = line.trim();
+			if (line.isEmpty())
+				break;
+
+			String key = parseKeyValueKey(line);
+			String value = parseKeyValueValue(line);
+
+			if (key.equals("SliderMultiplier")) {
+				sliderMultiplier = Double.parseDouble(value);
 			}
 		}
 	}
@@ -103,6 +158,7 @@ public class OsuDiff {
 
 			String[] values = line.split(",");
 			final long startTime = Integer.parseInt(values[2]);
+			final int flags = Integer.parseInt(values[3]);
 
 			boolean isSimultaneous = false;
 			for (DiffEvent diffEvent : diffEvents) {
@@ -119,7 +175,30 @@ public class OsuDiff {
 				DiffEvent diffEvent = new DiffEvent();
 				diffEvent.time = startTime;
 				diffEvent.data = line;
+				diffEvent.isHitObject = true;
 				diffEvents.add(diffEvent);
+			}
+
+			if (Utils.isSlider(flags)) {
+				TimingPoint timingPoint = Utils.getTimingPointAtTime(
+						timingPoints, startTime);
+
+				final int nodeCount = Integer.parseInt(values[6]) + 1;
+				final double length = Double.parseDouble(values[7]);
+
+				double sliderMultiplierLessLength = length / sliderMultiplier;
+				double lengthInBeats = sliderMultiplierLessLength / 100
+						* timingPoint.getMultiplier();
+				long repeatDuration = (long) (timingPoint.getBeatDuration() * lengthInBeats);
+
+				for (int i = 1; i < nodeCount; ++i) {
+					long nodeStartTime = startTime + i * repeatDuration;
+
+					DiffEvent diffEvent = new DiffEvent();
+					diffEvent.time = nodeStartTime;
+					diffEvent.isHitObject = true;
+					diffEvents.add(diffEvent);
+				}
 			}
 		}
 	}

@@ -3,15 +3,15 @@ package com.damnae.osukeysoundsplitter.pathprovider;
 import com.damnae.osukeysoundsplitter.KeysoundCache;
 
 public class AdditionsKeysoundPathProvider extends BaseKeysoundPathProvider {
-	private int sampleType;
-	private int samplesetIndex;
+	private int sampleSet;
+	private int sampleTypeIndex;
 	private int additionIndex;
 
 	public AdditionsKeysoundPathProvider(KeysoundCache keysoundCache,
 			int initialSampleType) {
 
 		super(keysoundCache);
-		sampleType = Math.max(1, initialSampleType);
+		sampleSet = Math.max(1, initialSampleType);
 	}
 
 	@Override
@@ -22,24 +22,24 @@ public class AdditionsKeysoundPathProvider extends BaseKeysoundPathProvider {
 	}
 
 	private String buildPath(String extension) {
-		return samplesetNames[samplesetIndex] + "-hit"
+		return sampleTypeNames[sampleTypeIndex] + "-hit"
 				+ additionNames[additionIndex]
-				+ (sampleType > 1 ? sampleType : "") + "." + extension;
+				+ (sampleSet > 1 ? sampleSet : "") + "." + extension;
 	}
 
 	private void incrementPath() {
 		++additionIndex;
 		if (additionIndex >= additionNames.length) {
 			additionIndex = 0;
-			++samplesetIndex;
-			if (samplesetIndex >= samplesetNames.length) {
-				samplesetIndex = 0;
-				++sampleType;
+			++sampleTypeIndex;
+			if (sampleTypeIndex >= sampleTypeNames.length) {
+				sampleTypeIndex = 0;
+				++sampleSet;
 			}
 		}
 	}
 
-	public static int getSampleType(String path) {
+	public static int getSampleSet(String path) {
 		int endPosition = path.lastIndexOf('.');
 		for (int i = endPosition - 1; i >= 0; --i) {
 			char c = path.charAt(i);
@@ -50,9 +50,9 @@ public class AdditionsKeysoundPathProvider extends BaseKeysoundPathProvider {
 		return 0;
 	}
 
-	public static int getAdditionsSampleset(String path) {
-		for (int i = 0, size = samplesetNames.length; i < size; ++i) {
-			if (path.startsWith(samplesetNames[i]))
+	public static int getSampleType(String path) {
+		for (int i = 0, size = sampleTypeNames.length; i < size; ++i) {
+			if (path.startsWith(sampleTypeNames[i]))
 				return i + 1;
 		}
 		return 0;
@@ -66,7 +66,7 @@ public class AdditionsKeysoundPathProvider extends BaseKeysoundPathProvider {
 		return 0;
 	}
 
-	private static String[] samplesetNames = { "normal", "soft", "drum" };
+	private static String[] sampleTypeNames = { "normal", "soft", "drum" };
 	private static String[] additionNames = { "whistle", "finish", "clap" };
 	private static int[] additionCodes = { 2, 4, 8 };
 }

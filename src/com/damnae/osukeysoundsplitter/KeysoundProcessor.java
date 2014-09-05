@@ -24,11 +24,15 @@ public class KeysoundProcessor {
 	private static final long SHORT_AUDIO_AREA_THRESHOLD = 10; // ms
 
 	public static class Keysound {
+		public enum Type {
+			HITOBJECT, LINE, AUTO
+		}
+
 		public String filename;
 		public long startTime;
 		public long endTime;
-		public boolean isAutosound;
 		public String data;
+		public Type type;
 	}
 
 	private KeysoundingStrategy keysoundingStrategy;
@@ -89,7 +93,8 @@ public class KeysoundProcessor {
 			Keysound keysound = new Keysound();
 			keysound.startTime = diffEvent.time;
 			keysound.endTime = nextDiffEvent.time;
-			keysound.isAutosound = isAutosound;
+			keysound.type = isAutosound ? Keysound.Type.AUTO : diffEvent
+					.isLine() ? Keysound.Type.LINE : Keysound.Type.HITOBJECT;
 			keysound.data = diffEvent.data;
 			keysounds.add(keysound);
 		}
@@ -162,7 +167,7 @@ public class KeysoundProcessor {
 
 						if (sectionName.equals("HitObjects")) {
 							for (Keysound keysound : keysounds) {
-								if (keysound.isAutosound)
+								if (keysound.type != Keysound.Type.HITOBJECT)
 									continue;
 
 								String[] keysoundDataLines = keysound.data
@@ -186,7 +191,7 @@ public class KeysoundProcessor {
 
 								if (line.equals("//Storyboard Sound Samples")) {
 									for (Keysound keysound : keysounds) {
-										if (!keysound.isAutosound)
+										if (keysound.type != Keysound.Type.AUTO)
 											continue;
 
 										writer.append("Sample,"
