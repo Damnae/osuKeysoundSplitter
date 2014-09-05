@@ -130,7 +130,7 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 			List<Keysound> keysounds) {
 
 		for (Keysound keysound : keysounds) {
-			boolean muteBody = false;
+			boolean muteBody = keysound.type == Keysound.Type.LINE;
 			if (keysound.type == Keysound.Type.HITOBJECT) {
 				String[] keysoundDataLines = keysound.data.split("\n");
 				if (keysoundDataLines.length > 1)
