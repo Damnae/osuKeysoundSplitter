@@ -48,7 +48,8 @@ public class OggKeysoundWriter extends BaseKeysoundWriter {
 		vorbis_info vorbisInfo = new vorbis_info();
 		vorbisenc encoder = new vorbisenc();
 
-		if (!encoder.vorbis_encode_init_vbr(vorbisInfo, 2, 44100, 0.3f))
+		if (!encoder.vorbis_encode_init_vbr(vorbisInfo, 2,
+				streamInfo.getSampleRate(), 0.3f))
 			throw new IOException("Failed to Initialize vorbisenc");
 
 		vorbis_comment comment = new vorbis_comment();
