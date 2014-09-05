@@ -111,7 +111,7 @@ public class KeysoundProcessor {
 	private void insertKeysounds(File diffFile, List<Keysound> keysounds,
 			List<String> keysoundFolderPaths) throws IOException {
 
-		// The file is assume to exist at this point
+		// The file is assumed to exist at this point
 		File backupFile = new File(diffFile.getCanonicalPath() + ".bak");
 		if (diffFile.length() == 0) {
 			System.out.println("diff file is empty, restoring from backup");

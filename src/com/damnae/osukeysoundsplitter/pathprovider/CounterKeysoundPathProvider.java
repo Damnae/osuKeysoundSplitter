@@ -1,13 +1,19 @@
 package com.damnae.osukeysoundsplitter.pathprovider;
 
+import com.damnae.osukeysoundsplitter.KeysoundCache;
+
 public class CounterKeysoundPathProvider extends BaseKeysoundPathProvider {
 	private String keysoundsFolderName;
 	private int fileIndex;
 
-	public CounterKeysoundPathProvider() {
+	public CounterKeysoundPathProvider(KeysoundCache keysoundCache) {
+		super(keysoundCache);
 	}
 
-	public CounterKeysoundPathProvider(String keysoundsFolderName) {
+	public CounterKeysoundPathProvider(KeysoundCache keysoundCache,
+			String keysoundsFolderName) {
+
+		super(keysoundCache);
 		this.keysoundsFolderName = keysoundsFolderName;
 	}
 

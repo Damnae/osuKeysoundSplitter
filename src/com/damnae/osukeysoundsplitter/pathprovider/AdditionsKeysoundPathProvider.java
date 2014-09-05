@@ -1,11 +1,16 @@
 package com.damnae.osukeysoundsplitter.pathprovider;
 
+import com.damnae.osukeysoundsplitter.KeysoundCache;
+
 public class AdditionsKeysoundPathProvider extends BaseKeysoundPathProvider {
 	private int sampleType;
 	private int samplesetIndex;
 	private int additionIndex;
 
-	public AdditionsKeysoundPathProvider(int initialSampleType) {
+	public AdditionsKeysoundPathProvider(KeysoundCache keysoundCache,
+			int initialSampleType) {
+
+		super(keysoundCache);
 		sampleType = Math.max(1, initialSampleType);
 	}
 

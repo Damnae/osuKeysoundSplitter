@@ -2,15 +2,16 @@ package com.damnae.osukeysoundsplitter.pathprovider;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
+
+import com.damnae.osukeysoundsplitter.KeysoundCache;
 
 public abstract class BaseKeysoundPathProvider implements KeysoundPathProvider {
+	private KeysoundCache keysoundCache;
 	private MessageDigest messageDigest;
 	private StringBuffer sb = new StringBuffer();
-	private Map<String, String> keysoundPaths = new HashMap<String, String>();
 
-	public BaseKeysoundPathProvider() {
+	public BaseKeysoundPathProvider(KeysoundCache keysoundCache) {
+		this.keysoundCache = keysoundCache;
 		try {
 			messageDigest = MessageDigest.getInstance("SHA1");
 
@@ -35,15 +36,16 @@ public abstract class BaseKeysoundPathProvider implements KeysoundPathProvider {
 
 	@Override
 	public boolean isRegistered(String keysoundIdentifier) {
-		return keysoundPaths.containsKey(keysoundIdentifier);
+		return keysoundCache.isRegistered(keysoundIdentifier);
 	}
 
 	@Override
 	public String getKeysoundPath(String keysoundIdentifier, String extension) {
-		String keysoundPath = keysoundPaths.get(keysoundIdentifier);
+		String keysoundPath = keysoundCache.getKeysoundPath(keysoundIdentifier);
+
 		if (keysoundPath == null) {
 			keysoundPath = getNewKeysoundPath(extension);
-			keysoundPaths.put(keysoundIdentifier, keysoundPath);
+			keysoundCache.register(keysoundIdentifier, keysoundPath);
 		}
 
 		return keysoundPath;

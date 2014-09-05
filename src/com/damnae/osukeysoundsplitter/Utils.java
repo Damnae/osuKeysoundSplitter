@@ -3,8 +3,6 @@ package com.damnae.osukeysoundsplitter;
 import java.io.File;
 import java.util.List;
 
-import com.damnae.osukeysoundsplitter.strategy.StandardKeysoundingStrategy.TimingPoint;
-
 public class Utils {
 
 	public static String getFileNameWithoutExtension(File file) {

@@ -45,16 +45,18 @@ public class MapsetProcessor {
 			}
 		});
 
+		File keysoundCacheFile = new File(folder, "keysound.cache");
+		KeysoundCache keysoundCache = new KeysoundCache(keysoundCacheFile);
+
 		ExecutorService executorService = Executors.newFixedThreadPool(Math
 				.max(1, Runtime.getRuntime().availableProcessors() - 1));
 
 		Map<String, DiffContext> diffContexts = new HashMap<String, DiffContext>();
 
 		KeysoundingStrategy keysoundingStrategy = new StandardKeysoundingStrategy(
-				100);
+				keysoundCache, 100);
 		// KeysoundingStrategy keysoundingStrategy = new
-		// ManiaKeysoundingStrategy(
-		// "ks");
+		// ManiaKeysoundingStrategy(keysoundCache, "ks");
 
 		for (File keysoundTrackFile : keysoundTrackFiles) {
 			String keysoundTrackName = getKeysoundTrackName(keysoundTrackFile);
@@ -114,6 +116,8 @@ public class MapsetProcessor {
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
+
+		keysoundCache.update();
 
 		long duration = System.nanoTime() - startTime;
 		System.out.println("Processed mapset in " + duration / 1000000000.0
