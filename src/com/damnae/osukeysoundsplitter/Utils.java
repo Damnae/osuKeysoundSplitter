@@ -1,10 +1,6 @@
 package com.damnae.osukeysoundsplitter;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 public class Utils {
 
@@ -48,23 +44,12 @@ public class Utils {
 		return sb.toString();
 	}
 
-	public static TimingPoint getTimingPointAtTime(
-			List<TimingPoint> timingPoints, long time) {
+	public static String parseKeyValueKey(String line) {
+		return line.substring(0, line.indexOf(":")).trim();
+	}
 
-		if (timingPoints == null || timingPoints.size() == 0)
-			return null;
-
-		TimingPoint currentTimingPoint = timingPoints.get(0);
-		for (TimingPoint timingsPoint : timingPoints) {
-			if (timingsPoint.time - 1 < time) {
-				currentTimingPoint = timingsPoint;
-
-			} else {
-				break;
-			}
-		}
-
-		return currentTimingPoint;
+	public static String parseKeyValueValue(String line) {
+		return line.substring(line.indexOf(":") + 1, line.length()).trim();
 	}
 
 	public static boolean isNoteOrCircle(int flags) {
@@ -81,95 +66,5 @@ public class Utils {
 
 	public static boolean isSpinner(int flags) {
 		return (flags & 8) != 0;
-	}
-
-	public static void sortTimingPoints(List<TimingPoint> timingPoints) {
-		Collections.sort(timingPoints, new Comparator<TimingPoint>() {
-
-			@Override
-			public int compare(TimingPoint t1, TimingPoint t2) {
-				int value = (int) (t1.time - t2.time);
-				if (value == 0)
-					value = (t1.isInherited ? 0 : 1) - (t2.isInherited ? 0 : 1);
-				return value;
-			}
-		});
-	}
-
-	public static TimingPoint getOrCreateTimingPoint(
-			List<TimingPoint> timingPoints, long time) {
-
-		TimingPoint timingPoint = getTimingPointAtTime(timingPoints, time);
-
-		if (Math.abs(timingPoint.time - time) > 1) {
-			timingPoint = timingPoint.createInherited(time);
-			timingPoints.add(timingPoint);
-		}
-		sortTimingPoints(timingPoints);
-
-		return timingPoint;
-	}
-
-	public static void simplifyTimingPoints(List<TimingPoint> timingPoints) {
-		TimingPoint previousTimingPoint = null;
-
-		int i = 0;
-		while (i < timingPoints.size()) {
-			TimingPoint timingPoint = timingPoints.get(i);
-			if (previousTimingPoint != null) {
-
-				if (timingPoint.isInherited
-						&& timingPoint.isSimilar(previousTimingPoint)) {
-
-					timingPoints.remove(i);
-					continue;
-				}
-			}
-			previousTimingPoint = timingPoint;
-			++i;
-		}
-	}
-
-	public static List<String> buildTimingPointLines(
-			List<TimingPoint> timingPoints) {
-
-		List<String> timingPointLines = new ArrayList<String>(
-				timingPoints.size());
-
-		for (TimingPoint timingPoint : timingPoints)
-			timingPointLines.add(timingPoint.toString());
-
-		return timingPointLines;
-	}
-
-	public static TimingPoint parseTimingPoint(String timingPointLine,
-			double previousNonInheritedBeatDuration) {
-
-		String[] values = timingPointLine.split(",");
-
-		if (values.length < 2)
-			throw new RuntimeException("Timing point has less than 2 values: "
-					+ timingPointLine);
-
-		TimingPoint timingPoint = new TimingPoint();
-		timingPoint.time = Long.parseLong(values[0]);
-		timingPoint.secondValue = Double.parseDouble(values[1]);
-		timingPoint.beatPerMeasure = values.length > 2 ? Integer
-				.parseInt(values[2]) : 4;
-		timingPoint.sampleType = values.length > 3 ? Integer
-				.parseInt(values[3]) : 1;
-		timingPoint.sampleSet = values.length > 4 ? Integer.parseInt(values[4])
-				: 1;
-		timingPoint.volume = values.length > 5 ? Integer.parseInt(values[5])
-				: 100;
-		timingPoint.isInherited = values.length > 6 ? Integer
-				.parseInt(values[6]) == 0 : false;
-		timingPoint.isKiai = values.length > 7 ? Integer.parseInt(values[7]) != 0
-				: false;
-
-		if (timingPoint.isInherited)
-			timingPoint.prevousBeatDuration = previousNonInheritedBeatDuration;
-
-		return timingPoint;
 	}
 }

@@ -92,7 +92,7 @@ public class OsuDiff {
 			if (line.isEmpty())
 				break;
 
-			TimingPoint timingPoint = Utils.parseTimingPoint(line,
+			TimingPoint timingPoint = TimingPoint.parseTimingPoint(line,
 					previousNonInheritedBeatDuration);
 
 			if (!timingPoint.isInherited)
@@ -101,7 +101,7 @@ public class OsuDiff {
 			timingPoints.add(timingPoint);
 		}
 
-		Utils.sortTimingPoints(timingPoints);
+		TimingPoint.sortTimingPoints(timingPoints);
 	}
 
 	private void parseOsuEditorSection(BufferedReader reader)
@@ -113,8 +113,8 @@ public class OsuDiff {
 			if (line.isEmpty())
 				break;
 
-			String key = parseKeyValueKey(line);
-			String value = parseKeyValueValue(line);
+			String key = Utils.parseKeyValueKey(line);
+			String value = Utils.parseKeyValueValue(line);
 
 			if (key.equals("Bookmarks")) {
 				String[] bookmarks = value.split(",");
@@ -138,8 +138,8 @@ public class OsuDiff {
 			if (line.isEmpty())
 				break;
 
-			String key = parseKeyValueKey(line);
-			String value = parseKeyValueValue(line);
+			String key = Utils.parseKeyValueKey(line);
+			String value = Utils.parseKeyValueValue(line);
 
 			if (key.equals("SliderMultiplier")) {
 				sliderMultiplier = Double.parseDouble(value);
@@ -160,54 +160,65 @@ public class OsuDiff {
 			final long startTime = Integer.parseInt(values[2]);
 			final int flags = Integer.parseInt(values[3]);
 
-			boolean isSimultaneous = false;
-			for (DiffEvent diffEvent : diffEvents) {
-				if (Math.abs(diffEvent.time - startTime) <= 2
-						&& diffEvent.data != null) {
+			if (Utils.isSpinner(flags)) {
+				final long endTime = Integer.parseInt(values[5]);
 
-					diffEvent.data += "\n" + line;
-					isSimultaneous = true;
-					break;
+				DiffEvent startDiffEvent = new DiffEvent();
+				startDiffEvent.time = startTime;
+				startDiffEvent.data = null;
+				startDiffEvent.isHitObject = false;
+				diffEvents.add(startDiffEvent);
+
+				DiffEvent endDiffEvent = new DiffEvent();
+				endDiffEvent.time = endTime;
+				endDiffEvent.data = line;
+				endDiffEvent.isHitObject = true;
+				diffEvents.add(endDiffEvent);
+
+			} else {
+				boolean isSimultaneous = false;
+				for (DiffEvent diffEvent : diffEvents) {
+					if (Math.abs(diffEvent.time - startTime) <= 2
+							&& diffEvent.data != null) {
+
+						diffEvent.data += "\n" + line;
+						isSimultaneous = true;
+						break;
+					}
 				}
-			}
 
-			if (!isSimultaneous) {
-				DiffEvent diffEvent = new DiffEvent();
-				diffEvent.time = startTime;
-				diffEvent.data = line;
-				diffEvent.isHitObject = true;
-				diffEvents.add(diffEvent);
-			}
-
-			if (Utils.isSlider(flags)) {
-				TimingPoint timingPoint = Utils.getTimingPointAtTime(
-						timingPoints, startTime);
-
-				final int nodeCount = Integer.parseInt(values[6]) + 1;
-				final double length = Double.parseDouble(values[7]);
-
-				double sliderMultiplierLessLength = length / sliderMultiplier;
-				double lengthInBeats = sliderMultiplierLessLength / 100
-						* timingPoint.getMultiplier();
-				long repeatDuration = (long) (timingPoint.getBeatDuration() * lengthInBeats);
-
-				for (int i = 1; i < nodeCount; ++i) {
-					long nodeStartTime = startTime + i * repeatDuration;
-
+				if (!isSimultaneous) {
 					DiffEvent diffEvent = new DiffEvent();
-					diffEvent.time = nodeStartTime;
+					diffEvent.time = startTime;
+					diffEvent.data = line;
 					diffEvent.isHitObject = true;
 					diffEvents.add(diffEvent);
+
+					if (Utils.isSlider(flags)) {
+						TimingPoint timingPoint = TimingPoint
+								.getTimingPointAtTime(timingPoints, startTime);
+
+						final int nodeCount = Integer.parseInt(values[6]) + 1;
+						final double length = Double.parseDouble(values[7]);
+
+						double sliderMultiplierLessLength = length
+								/ sliderMultiplier;
+						double lengthInBeats = sliderMultiplierLessLength / 100
+								* timingPoint.getMultiplier();
+						long repeatDuration = (long) (timingPoint
+								.getBeatDuration() * lengthInBeats);
+
+						for (int i = 1; i < nodeCount; ++i) {
+							long nodeStartTime = startTime + i * repeatDuration;
+
+							DiffEvent nodeDiffEvent = new DiffEvent();
+							nodeDiffEvent.time = nodeStartTime;
+							nodeDiffEvent.isHitObject = true;
+							diffEvents.add(nodeDiffEvent);
+						}
+					}
 				}
 			}
 		}
-	}
-
-	private static String parseKeyValueKey(String line) {
-		return line.substring(0, line.indexOf(":")).trim();
-	}
-
-	private static String parseKeyValueValue(String line) {
-		return line.substring(line.indexOf(":") + 1, line.length()).trim();
 	}
 }

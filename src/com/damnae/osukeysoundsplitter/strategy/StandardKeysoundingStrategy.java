@@ -72,7 +72,16 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 			keysoundData = Utils.joinValues(values, ",");
 
 		} else if (Utils.isSpinner(flags)) {
+			String[] hitsoundValues = Utils.splitValues(values[6], ':');
+			hitsoundValues[0] = "0";
+			hitsoundValues[1] = "0";
+			hitsoundValues[2] = "0";
+			hitsoundValues[3] = "0";
+			hitsoundValues[4] = "";
 
+			values[4] = "0";
+			values[6] = Utils.joinValues(hitsoundValues, ":");
+			keysoundData = Utils.joinValues(values, ",");
 		}
 
 		return keysoundData;
@@ -86,7 +95,7 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 		removeKeysounding(timingPoints);
 		insertKeysounds(timingPoints, keysounds);
 
-		return Utils.buildTimingPointLines(timingPoints);
+		return TimingPoint.buildTimingPointLines(timingPoints);
 	}
 
 	private List<TimingPoint> parseTimingPoints(List<String> timingPointLines) {
@@ -95,15 +104,15 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 
 		double previousNonInheritedBeatDuration = 0;
 		for (String timingPointLine : timingPointLines) {
-			TimingPoint timingPoint = Utils.parseTimingPoint(timingPointLine,
-					previousNonInheritedBeatDuration);
+			TimingPoint timingPoint = TimingPoint.parseTimingPoint(
+					timingPointLine, previousNonInheritedBeatDuration);
 
 			if (!timingPoint.isInherited)
 				previousNonInheritedBeatDuration = timingPoint.secondValue;
 			timingPoints.add(timingPoint);
 		}
 
-		Utils.sortTimingPoints(timingPoints);
+		TimingPoint.sortTimingPoints(timingPoints);
 
 		return timingPoints;
 	}
@@ -114,15 +123,15 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 			timingPoint.sampleSet = 0;
 			timingPoint.volume = 100;
 		}
-		Utils.simplifyTimingPoints(timingPoints);
+		TimingPoint.simplifyTimingPoints(timingPoints);
 	}
 
 	private void insertKeysounds(List<TimingPoint> timingPoints,
 			List<Keysound> keysounds) {
 
 		for (Keysound keysound : keysounds) {
+			boolean muteBody = false;
 			if (keysound.type == Keysound.Type.HITOBJECT) {
-
 				String[] keysoundDataLines = keysound.data.split("\n");
 				if (keysoundDataLines.length > 1)
 					continue;
@@ -131,8 +140,10 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 				String[] values = keysoundData.split(",");
 				final int flags = Integer.parseInt(values[3]);
 
-				if (!Utils.isSlider(flags))
+				if (!Utils.isSlider(flags) && !Utils.isSpinner(flags))
 					continue;
+
+				muteBody = Utils.isSlider(flags);
 
 			} else if (keysound.type != Keysound.Type.LINE) {
 				continue;
@@ -142,17 +153,20 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 				continue;
 
 			long startTime = keysound.startTime;
+			long endTime = keysound.endTime;
 
 			// Reset normal timing point values
-			Utils.getOrCreateTimingPoint(timingPoints, keysound.endTime);
+			TimingPoint.getOrCreateTimingPoint(timingPoints, endTime);
 
-			// Silence slider body / repeats / end
-			TimingPoint silentTimingPoint = Utils.getOrCreateTimingPoint(
-					timingPoints, startTime + 10);
-			silentTimingPoint.volume = 5;
+			if (muteBody) {
+				// Silence slider body
+				TimingPoint silentTimingPoint = TimingPoint
+						.getOrCreateTimingPoint(timingPoints, startTime + 10);
+				silentTimingPoint.volume = 5;
+			}
 
 			// Set head sampleset and volume
-			TimingPoint timingPoint = Utils.getOrCreateTimingPoint(
+			TimingPoint timingPoint = TimingPoint.getOrCreateTimingPoint(
 					timingPoints, startTime);
 			timingPoint.sampleType = HitnormalKeysoundPathProvider
 					.getSampleType(keysound.filename);
@@ -160,6 +174,6 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 					.getSampleSet(keysound.filename);
 			timingPoint.volume = 100;
 		}
-		Utils.simplifyTimingPoints(timingPoints);
+		TimingPoint.simplifyTimingPoints(timingPoints);
 	}
 }
