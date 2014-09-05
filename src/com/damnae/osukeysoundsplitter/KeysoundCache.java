@@ -53,6 +53,10 @@ public class KeysoundCache {
 		return keysoundPaths.containsKey(keysoundIdentifier);
 	}
 
+	public boolean isPathRegistered(String path) {
+		return keysoundPaths.containsValue(path);
+	}
+
 	public String getKeysoundPath(String keysoundIdentifier) {
 		unusedIdentifiers.remove(keysoundIdentifier);
 		return keysoundPaths.get(keysoundIdentifier);
