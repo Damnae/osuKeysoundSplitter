@@ -35,8 +35,17 @@ public class KeysoundCache {
 						line = line.trim();
 
 						String[] keyVal = Utils.splitValues(line, '=');
-						keysoundPaths.put(keyVal[0], keyVal[1]);
-						unusedIdentifiers.add(keyVal[0]);
+						String identifier = keyVal[0];
+						String path = keyVal[1];
+
+						File keysoundFile = new File(
+								keysoundCacheFile.getParentFile(), path);
+
+						if (!keysoundFile.exists())
+							continue;
+
+						keysoundPaths.put(identifier, path);
+						unusedIdentifiers.add(identifier);
 					}
 
 				} finally {
