@@ -10,5 +10,7 @@ public interface AudioEncoder {
 	void encode(File toFile, byte[] data, AudioTrackInfo info)
 			throws IOException;
 
+	void encodeSilence(File toFile) throws IOException;
+
 	String getExtension();
 }

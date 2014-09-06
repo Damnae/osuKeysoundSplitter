@@ -1,6 +1,4 @@
-package com.damnae.osukeysoundsplitter;
-
-import com.damnae.osukeysoundsplitter.audio.AudioTrackInfo;
+package com.damnae.osukeysoundsplitter.audio;
 
 public abstract class BaseAudioTrackInfo implements AudioTrackInfo {
 

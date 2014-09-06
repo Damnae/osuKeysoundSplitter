@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.damnae.osukeysoundsplitter.audio.decode.AudioDecoder;
 import com.damnae.osukeysoundsplitter.audio.decode.FlacAudioDecoder;
+import com.damnae.osukeysoundsplitter.audio.encode.OggAudioEncoder;
 import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
 import com.damnae.osukeysoundsplitter.strategy.StandardKeysoundingStrategy;
 
@@ -56,9 +57,10 @@ public class MapsetProcessor {
 		Map<String, DiffContext> diffContexts = new HashMap<String, DiffContext>();
 
 		KeysoundingStrategy keysoundingStrategy = new StandardKeysoundingStrategy(
-				keysoundCache, 100);
+				folder, keysoundCache, new OggAudioEncoder(), 100);
 		// KeysoundingStrategy keysoundingStrategy = new
-		// ManiaKeysoundingStrategy(keysoundCache, "ks");
+		// ManiaKeysoundingStrategy(
+		// folder, keysoundCache, new OggAudioEncoder(), "ks");
 
 		for (File keysoundTrackFile : keysoundTrackFiles) {
 			String keysoundTrackName = getKeysoundTrackName(keysoundTrackFile);

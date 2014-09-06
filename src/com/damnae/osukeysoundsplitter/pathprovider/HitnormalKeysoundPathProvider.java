@@ -1,5 +1,7 @@
 package com.damnae.osukeysoundsplitter.pathprovider;
 
+import java.security.InvalidParameterException;
+
 import com.damnae.osukeysoundsplitter.KeysoundCache;
 
 public class HitnormalKeysoundPathProvider extends BaseKeysoundPathProvider {
@@ -57,6 +59,13 @@ public class HitnormalKeysoundPathProvider extends BaseKeysoundPathProvider {
 				return i + 1;
 		}
 		return 0;
+	}
+
+	public static String getSampleTypeName(int sampleType) {
+		if (sampleType < 1 || sampleType > sampleTypeNames.length)
+			throw new InvalidParameterException(String.valueOf(sampleType));
+
+		return sampleTypeNames[sampleType - 1];
 	}
 
 	private static String[] sampleTypeNames = { "normal", "soft", "drum" };

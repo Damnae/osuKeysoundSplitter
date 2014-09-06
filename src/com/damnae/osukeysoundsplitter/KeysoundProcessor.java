@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import com.damnae.osukeysoundsplitter.OsuDiff.DiffEvent;
-import com.damnae.osukeysoundsplitter.audio.encode.OggAudioEncoder;
 import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
 
 public class KeysoundProcessor {
@@ -93,9 +92,8 @@ public class KeysoundProcessor {
 			List<Keysound> keysounds, int offset,
 			ExecutorService executorService) throws IOException {
 
-		File mapsetFolder = keysoundsFile.getParentFile();
-		KeysoundWriter writer = new KeysoundWriter(mapsetFolder,
-				keysoundingStrategy, new OggAudioEncoder(), executorService);
+		KeysoundWriter writer = new KeysoundWriter(keysoundingStrategy,
+				executorService);
 
 		return new KeysoundExtractor(keysounds, writer, offset);
 	}

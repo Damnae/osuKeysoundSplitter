@@ -1,20 +1,27 @@
 package com.damnae.osukeysoundsplitter.strategy;
 
+import java.io.File;
+
 import com.damnae.osukeysoundsplitter.Keysound;
 import com.damnae.osukeysoundsplitter.KeysoundCache;
+import com.damnae.osukeysoundsplitter.audio.encode.AudioEncoder;
 import com.damnae.osukeysoundsplitter.pathprovider.CounterKeysoundPathProvider;
 
 public class ManiaKeysoundingStrategy extends BaseKeysoundingStrategy {
 
-	public ManiaKeysoundingStrategy(KeysoundCache keysoundCache) {
-		super(new CounterKeysoundPathProvider(keysoundCache));
+	public ManiaKeysoundingStrategy(File mapsetFolder,
+			KeysoundCache keysoundCache, AudioEncoder audioEncoder) {
+
+		super(mapsetFolder, new CounterKeysoundPathProvider(keysoundCache),
+				audioEncoder);
 	}
 
-	public ManiaKeysoundingStrategy(KeysoundCache keysoundCache,
+	public ManiaKeysoundingStrategy(File mapsetFolder,
+			KeysoundCache keysoundCache, AudioEncoder audioEncoder,
 			String keysoundsFolderName) {
 
-		super(new CounterKeysoundPathProvider(keysoundCache,
-				keysoundsFolderName));
+		super(mapsetFolder, new CounterKeysoundPathProvider(keysoundCache,
+				keysoundsFolderName), audioEncoder);
 	}
 
 	@Override

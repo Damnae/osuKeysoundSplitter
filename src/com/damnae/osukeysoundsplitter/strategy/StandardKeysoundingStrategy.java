@@ -1,5 +1,7 @@
 package com.damnae.osukeysoundsplitter.strategy;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,14 +10,19 @@ import com.damnae.osukeysoundsplitter.Keysound;
 import com.damnae.osukeysoundsplitter.KeysoundCache;
 import com.damnae.osukeysoundsplitter.TimingPoint;
 import com.damnae.osukeysoundsplitter.Utils;
+import com.damnae.osukeysoundsplitter.audio.encode.AudioEncoder;
+import com.damnae.osukeysoundsplitter.audio.encode.WavAudioEncoder;
 import com.damnae.osukeysoundsplitter.pathprovider.HitnormalKeysoundPathProvider;
 
 public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
+	private AudioEncoder silentAudioEncoder = new WavAudioEncoder();
 
-	public StandardKeysoundingStrategy(KeysoundCache keysoundCache,
+	public StandardKeysoundingStrategy(File mapsetFolder,
+			KeysoundCache keysoundCache, AudioEncoder audioEncoder,
 			int initialSampleType) {
-		super(new HitnormalKeysoundPathProvider(keysoundCache,
-				initialSampleType));
+
+		super(mapsetFolder, new HitnormalKeysoundPathProvider(keysoundCache,
+				initialSampleType), audioEncoder);
 	}
 
 	@Override
@@ -155,13 +162,6 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 			// Reset normal timing point values
 			TimingPoint.getOrCreateTimingPoint(timingPoints, endTime);
 
-			if (muteBody) {
-				// Silence slider body
-				TimingPoint silentTimingPoint = TimingPoint
-						.getOrCreateTimingPoint(timingPoints, startTime + 10);
-				silentTimingPoint.volume = 5;
-			}
-
 			// Set head sampleset and volume
 			TimingPoint timingPoint = TimingPoint.getOrCreateTimingPoint(
 					timingPoints, startTime);
@@ -170,6 +170,31 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 			timingPoint.sampleSet = HitnormalKeysoundPathProvider
 					.getSampleSet(keysound.filename);
 			timingPoint.volume = 100;
+
+			if (muteBody) {
+				// Silence slider ticks
+				TimingPoint silentTimingPoint = TimingPoint
+						.getOrCreateTimingPoint(timingPoints, startTime + 10);
+				silentTimingPoint.volume = 5;
+
+				// Make silent slider slide sample
+				String sliderSliderPath = HitnormalKeysoundPathProvider
+						.getSampleTypeName(timingPoint.sampleType)
+						+ "-sliderslide"
+						+ timingPoint.sampleSet
+						+ "."
+						+ silentAudioEncoder.getExtension();
+
+				File silentFile = new File(getMapsetFolder(), sliderSliderPath);
+				if (!silentFile.exists()) {
+					try {
+						silentAudioEncoder.encodeSilence(silentFile);
+
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			}
 		}
 		TimingPoint.simplifyTimingPoints(timingPoints);
 	}

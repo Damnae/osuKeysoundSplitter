@@ -12,7 +12,7 @@ import org.kc7bfi.jflac.PCMProcessor;
 import org.kc7bfi.jflac.metadata.StreamInfo;
 import org.kc7bfi.jflac.util.ByteData;
 
-import com.damnae.osukeysoundsplitter.BaseAudioTrackInfo;
+import com.damnae.osukeysoundsplitter.audio.BaseAudioTrackInfo;
 
 public class FlacAudioDecoder implements AudioDecoder {
 	private File audioFile;

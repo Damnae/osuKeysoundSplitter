@@ -10,26 +10,22 @@ import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
 import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
 
 public class KeysoundWriter {
-	private File mapsetFolder;
 	private KeysoundingStrategy keysoundingStrategy;
-	private AudioEncoder audioEncoder;
 	private ExecutorService executorService;
 
-	public KeysoundWriter(File mapsetFolder,
-			KeysoundingStrategy keysoundingStrategy, AudioEncoder audioEncoder,
+	public KeysoundWriter(KeysoundingStrategy keysoundingStrategy,
 			ExecutorService executorService) {
 
-		this.mapsetFolder = mapsetFolder;
 		this.keysoundingStrategy = keysoundingStrategy;
-		this.audioEncoder = audioEncoder;
 		this.executorService = executorService;
 	}
 
 	public String writeKeysound(final byte[] data, final AudioTrackInfo info)
 			throws IOException {
 
-		KeysoundPathProvider keysoundPathProvider = keysoundingStrategy
+		final KeysoundPathProvider keysoundPathProvider = keysoundingStrategy
 				.getKeysoundPathProvider();
+		final AudioEncoder audioEncoder = keysoundingStrategy.getAudioEncoder();
 
 		String keysoundIdentifier = keysoundPathProvider.getIdentifier(data);
 		boolean isGenerated = keysoundPathProvider
@@ -43,7 +39,8 @@ public class KeysoundWriter {
 
 				@Override
 				public void run() {
-					File keysoundFile = new File(mapsetFolder, keysoundPath);
+					File keysoundFile = new File(keysoundingStrategy
+							.getMapsetFolder(), keysoundPath);
 
 					System.out.println("Writing keysound "
 							+ keysoundFile.getPath());
