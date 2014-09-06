@@ -62,16 +62,8 @@ public class KeysoundCache {
 		return keysoundPaths.containsKey(keysoundIdentifier);
 	}
 
-	public boolean isPathAvailable(String keysoundIdentifier, String path) {
-		String registeredPath = keysoundPaths.get(keysoundIdentifier);
-		if (registeredPath != null) {
-			// Path is registered with the same identifier
-			return registeredPath.equals(path);
-
-		} else {
-			// Path isn't used for any identifier
-			return !keysoundPaths.containsValue(path);
-		}
+	public boolean isPathAvailable(String path) {
+		return !keysoundPaths.containsValue(path);
 	}
 
 	public String getKeysoundPath(String keysoundIdentifier) {

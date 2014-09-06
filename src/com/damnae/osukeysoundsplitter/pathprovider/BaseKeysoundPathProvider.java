@@ -48,8 +48,7 @@ public abstract class BaseKeysoundPathProvider implements KeysoundPathProvider {
 
 		if (keysoundPath == null) {
 			while (keysoundPath == null
-					|| !keysoundCache.isPathAvailable(keysoundIdentifier,
-							keysoundPath)) {
+					|| !keysoundCache.isPathAvailable(keysoundPath)) {
 
 				keysoundPath = getNewKeysoundPath(extension);
 			}
