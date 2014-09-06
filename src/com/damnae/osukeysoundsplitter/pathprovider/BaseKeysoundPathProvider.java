@@ -35,8 +35,8 @@ public abstract class BaseKeysoundPathProvider implements KeysoundPathProvider {
 	}
 
 	@Override
-	public boolean isRegistered(String keysoundIdentifier) {
-		return keysoundCache.isRegistered(keysoundIdentifier);
+	public boolean isGenerated(String keysoundIdentifier) {
+		return keysoundCache.hasKeysound(keysoundIdentifier);
 	}
 
 	@Override
@@ -48,7 +48,8 @@ public abstract class BaseKeysoundPathProvider implements KeysoundPathProvider {
 
 		if (keysoundPath == null) {
 			while (keysoundPath == null
-					|| keysoundCache.isPathRegistered(keysoundPath)) {
+					|| !keysoundCache.isPathAvailable(keysoundIdentifier,
+							keysoundPath)) {
 
 				keysoundPath = getNewKeysoundPath(extension);
 			}

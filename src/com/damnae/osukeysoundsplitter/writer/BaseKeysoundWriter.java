@@ -32,13 +32,13 @@ public abstract class BaseKeysoundWriter implements KeysoundWriter {
 				.getKeysoundPathProvider();
 
 		String keysoundIdentifier = keysoundPathProvider.getIdentifier(data);
-		boolean registered = keysoundPathProvider
-				.isRegistered(keysoundIdentifier);
+		boolean isGenerated = keysoundPathProvider
+				.isGenerated(keysoundIdentifier);
 
 		final String keysoundPath = keysoundPathProvider.getKeysoundPath(
 				keysoundIdentifier, getExtension());
 
-		if (!registered) {
+		if (!isGenerated) {
 			executorService.execute(new Runnable() {
 
 				@Override
@@ -49,7 +49,6 @@ public abstract class BaseKeysoundWriter implements KeysoundWriter {
 					System.out.println("Writing keysound "
 							+ keysoundFile.getPath());
 					try {
-
 						FileOutputStream os;
 						os = new FileOutputStream(keysoundFile);
 						try {

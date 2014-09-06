@@ -58,12 +58,20 @@ public class KeysoundCache {
 		}
 	}
 
-	public boolean isRegistered(String keysoundIdentifier) {
+	public boolean hasKeysound(String keysoundIdentifier) {
 		return keysoundPaths.containsKey(keysoundIdentifier);
 	}
 
-	public boolean isPathRegistered(String path) {
-		return keysoundPaths.containsValue(path);
+	public boolean isPathAvailable(String keysoundIdentifier, String path) {
+		String registeredPath = keysoundPaths.get(keysoundIdentifier);
+		if (registeredPath != null) {
+			// Path is registered with the same identifier
+			return registeredPath.equals(path);
+
+		} else {
+			// Path isn't used for any identifier
+			return !keysoundPaths.containsValue(path);
+		}
 	}
 
 	public String getKeysoundPath(String keysoundIdentifier) {
