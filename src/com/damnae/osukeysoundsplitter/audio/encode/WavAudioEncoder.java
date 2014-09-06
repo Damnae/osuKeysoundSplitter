@@ -1,36 +1,26 @@
-package com.damnae.osukeysoundsplitter.writer;
+package com.damnae.osukeysoundsplitter.audio.encode;
 
 import java.io.DataOutput;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
 
-import org.kc7bfi.jflac.metadata.StreamInfo;
 import org.kc7bfi.jflac.util.LittleEndianDataOutput;
 
-import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
+import com.damnae.osukeysoundsplitter.audio.AudioTrackInfo;
 
-public class WavKeysoundWriter extends BaseKeysoundWriter {
-
-	public WavKeysoundWriter(File mapsetFolder,
-			KeysoundingStrategy keysoundingStrategy,
-			ExecutorService executorService) {
-		super(mapsetFolder, keysoundingStrategy, executorService);
-	}
+public class WavAudioEncoder extends BaseAudioEncoder {
 
 	@Override
-	protected void writeKeysound(FileOutputStream os, byte[] data,
-			StreamInfo streamInfo) throws IOException {
-
+	protected void encode(FileOutputStream os, byte[] data, AudioTrackInfo info)
+			throws IOException {
 		DataOutput dataOutput = new DataOutputStream(os);
 		LittleEndianDataOutput dataOutputLE = new LittleEndianDataOutput(
 				dataOutput);
 
-		int channels = streamInfo.getChannels();
-		int bps = streamInfo.getBitsPerSample();
-		int sampleRate = streamInfo.getSampleRate();
+		int channels = info.getChannels();
+		int bps = info.getBitsPerSample();
+		int sampleRate = info.getSampleRate();
 		long totalSamples = data.length / ((bps / 8) * channels);
 		long dataSize = totalSamples * (bps / 8) * channels;
 
@@ -50,7 +40,7 @@ public class WavKeysoundWriter extends BaseKeysoundWriter {
 	}
 
 	@Override
-	protected String getExtension() {
+	public String getExtension() {
 		return "wav";
 	}
 }

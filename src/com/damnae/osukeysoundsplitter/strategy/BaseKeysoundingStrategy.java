@@ -2,7 +2,7 @@ package com.damnae.osukeysoundsplitter.strategy;
 
 import java.util.List;
 
-import com.damnae.osukeysoundsplitter.KeysoundProcessor.Keysound;
+import com.damnae.osukeysoundsplitter.Keysound;
 import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
 
 public abstract class BaseKeysoundingStrategy implements KeysoundingStrategy {

@@ -10,6 +10,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.damnae.osukeysoundsplitter.audio.decode.AudioDecoder;
+import com.damnae.osukeysoundsplitter.audio.decode.FlacAudioDecoder;
 import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
 import com.damnae.osukeysoundsplitter.strategy.StandardKeysoundingStrategy;
 
@@ -60,7 +62,7 @@ public class MapsetProcessor {
 
 		for (File keysoundTrackFile : keysoundTrackFiles) {
 			String keysoundTrackName = getKeysoundTrackName(keysoundTrackFile);
-			KeysoundTrackDecoder keysoundTrackDecoder = new KeysoundTrackDecoder(
+			AudioDecoder keysoundTrackDecoder = new FlacAudioDecoder(
 					keysoundTrackFile);
 
 			for (File diffFile : diffFiles) {

@@ -39,6 +39,7 @@ public class AdditionsKeysoundPathProvider extends BaseKeysoundPathProvider {
 		}
 	}
 
+	@Override
 	protected boolean isPathValid(String keysoundPath) {
 		return !keysoundPath.contains("/") && !keysoundPath.contains("\\")
 				&& keysoundPath.contains("-hit")

@@ -4,19 +4,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import org.kc7bfi.jflac.PCMProcessor;
-import org.kc7bfi.jflac.metadata.StreamInfo;
-import org.kc7bfi.jflac.util.ByteData;
+import com.damnae.osukeysoundsplitter.audio.AudioTrackInfo;
+import com.damnae.osukeysoundsplitter.audio.decode.TrackProcessor;
 
-import com.damnae.osukeysoundsplitter.KeysoundProcessor.Keysound;
-import com.damnae.osukeysoundsplitter.writer.KeysoundWriter;
-
-public class KeysoundExtractor implements PCMProcessor {
+public class KeysoundExtractor implements TrackProcessor {
 	private List<Keysound> keysounds;
 	private KeysoundWriter keysoundWriter;
 	private int offset;
 
-	private StreamInfo info;
+	private AudioTrackInfo info;
 	private int bytesPerSample;
 	private int bytesPerSecond;
 
@@ -33,13 +29,19 @@ public class KeysoundExtractor implements PCMProcessor {
 		this.offset = offset;
 	}
 
-	public void complete() throws IOException {
-		writeKeysound(keysoundIndex);
-		bos.close();
+	@Override
+	public void decodingCompleted() {
+		try {
+			writeKeysound(keysoundIndex);
+			bos.close();
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
-	public void processStreamInfo(StreamInfo info) {
+	public void processTrackInfo(AudioTrackInfo info) {
 		System.out.println(info);
 
 		this.info = info;
@@ -51,13 +53,13 @@ public class KeysoundExtractor implements PCMProcessor {
 	}
 
 	@Override
-	public void processPCM(ByteData pcm) {
+	public void processPCM(byte[] data, int length) {
 		double startTime = (pcmPosition * 1000.0) / bytesPerSecond - offset;
-		double endTime = ((pcmPosition + pcm.getLen()) * 1000.0)
-				/ bytesPerSecond - offset;
-		double duration = (pcm.getLen() * 1000.0) / bytesPerSecond;
+		double endTime = ((pcmPosition + length) * 1000.0) / bytesPerSecond
+				- offset;
+		double duration = (length * 1000.0) / bytesPerSecond;
 
-		int samples = pcm.getLen() / bytesPerSample;
+		int samples = length / bytesPerSample;
 		int consumedSamples = 0;
 
 		// Check to move to the next keysound
@@ -75,7 +77,7 @@ public class KeysoundExtractor implements PCMProcessor {
 				int toSamples = (int) (timePercentage * samples);
 
 				if (keysoundIndex > 0)
-					writePCM(pcm, consumedSamples, toSamples - consumedSamples);
+					writePCM(data, consumedSamples, toSamples - consumedSamples);
 				startKeysound();
 
 				consumedSamples = toSamples;
@@ -89,14 +91,14 @@ public class KeysoundExtractor implements PCMProcessor {
 				&& startTime < keysounds.get(keysoundIndex).endTime) {
 
 			try {
-				writePCM(pcm, consumedSamples, samples - consumedSamples);
+				writePCM(data, consumedSamples, samples - consumedSamples);
 
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
 
-		pcmPosition += pcm.getLen();
+		pcmPosition += length;
 	}
 
 	private void startKeysound() throws IOException {
@@ -106,20 +108,20 @@ public class KeysoundExtractor implements PCMProcessor {
 		}
 	}
 
-	private void writePCM(ByteData pcm, int sampletOffset, int samples)
+	private void writePCM(byte[] data, int sampletOffset, int samples)
 			throws IOException {
 
 		int offset = sampletOffset * bytesPerSample;
 		int length = samples * bytesPerSample;
 
 		try {
-			bos.write(pcm.getData(), offset, length);
+			bos.write(data, offset, length);
 
 		} catch (IndexOutOfBoundsException e) {
 			System.err.println("index out of bounds writing samples from "
 					+ sampletOffset + " to " + (sampletOffset + samples)
 					+ ", bytes from " + offset + " to " + (offset + length)
-					+ " of " + pcm.getLen());
+					+ " of " + data.length);
 
 			throw e;
 		}

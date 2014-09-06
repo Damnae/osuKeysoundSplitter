@@ -33,6 +33,7 @@ public class HitnormalKeysoundPathProvider extends BaseKeysoundPathProvider {
 		}
 	}
 
+	@Override
 	protected boolean isPathValid(String keysoundPath) {
 		return !keysoundPath.contains("/") && !keysoundPath.contains("\\")
 				&& keysoundPath.contains("-hitnormal")

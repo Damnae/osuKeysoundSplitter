@@ -1,12 +1,9 @@
-package com.damnae.osukeysoundsplitter.writer;
+package com.damnae.osukeysoundsplitter.audio.encode;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
 
-import org.kc7bfi.jflac.metadata.StreamInfo;
 import org.xiph.libogg.ogg_packet;
 import org.xiph.libogg.ogg_page;
 import org.xiph.libogg.ogg_stream_state;
@@ -16,23 +13,17 @@ import org.xiph.libvorbis.vorbis_dsp_state;
 import org.xiph.libvorbis.vorbis_info;
 import org.xiph.libvorbis.vorbisenc;
 
-import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
+import com.damnae.osukeysoundsplitter.audio.AudioTrackInfo;
 
-public class OggKeysoundWriter extends BaseKeysoundWriter {
+public class OggAudioEncoder extends BaseAudioEncoder {
 	private static final int SAMPLE_COUNT = 1024;
 
-	public OggKeysoundWriter(File mapsetFolder,
-			KeysoundingStrategy keysoundingStrategy,
-			ExecutorService executorService) {
-		super(mapsetFolder, keysoundingStrategy, executorService);
-	}
-
 	@Override
-	protected void writeKeysound(FileOutputStream fos, byte[] data,
-			StreamInfo streamInfo) throws IOException {
+	protected void encode(FileOutputStream fos, byte[] data, AudioTrackInfo info)
+			throws IOException {
 
-		int bitsPerSample = streamInfo.getBitsPerSample();
-		int channels = streamInfo.getChannels();
+		int bitsPerSample = info.getBitsPerSample();
+		int channels = info.getChannels();
 
 		if (bitsPerSample != 16)
 			throw new UnsupportedOperationException(
@@ -49,7 +40,7 @@ public class OggKeysoundWriter extends BaseKeysoundWriter {
 		vorbisenc encoder = new vorbisenc();
 
 		if (!encoder.vorbis_encode_init_vbr(vorbisInfo, 2,
-				streamInfo.getSampleRate(), 0.3f))
+				info.getSampleRate(), 0.3f))
 			throw new IOException("Failed to Initialize vorbisenc");
 
 		vorbis_comment comment = new vorbis_comment();
@@ -141,7 +132,7 @@ public class OggKeysoundWriter extends BaseKeysoundWriter {
 	}
 
 	@Override
-	protected String getExtension() {
+	public String getExtension() {
 		return "ogg";
 	}
 }

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.damnae.osukeysoundsplitter.Keysound;
 import com.damnae.osukeysoundsplitter.KeysoundCache;
-import com.damnae.osukeysoundsplitter.KeysoundProcessor.Keysound;
 import com.damnae.osukeysoundsplitter.TimingPoint;
 import com.damnae.osukeysoundsplitter.Utils;
 import com.damnae.osukeysoundsplitter.pathprovider.HitnormalKeysoundPathProvider;

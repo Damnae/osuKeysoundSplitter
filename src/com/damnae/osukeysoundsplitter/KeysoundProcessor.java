@@ -16,24 +16,11 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import com.damnae.osukeysoundsplitter.OsuDiff.DiffEvent;
+import com.damnae.osukeysoundsplitter.audio.encode.OggAudioEncoder;
 import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
-import com.damnae.osukeysoundsplitter.writer.KeysoundWriter;
-import com.damnae.osukeysoundsplitter.writer.OggKeysoundWriter;
 
 public class KeysoundProcessor {
 	private static final long SHORT_AUDIO_AREA_THRESHOLD = 10; // ms
-
-	public static class Keysound {
-		public enum Type {
-			HITOBJECT, LINE, AUTO
-		}
-
-		public String filename;
-		public long startTime;
-		public long endTime;
-		public String data;
-		public Type type;
-	}
 
 	private KeysoundingStrategy keysoundingStrategy;
 	private List<Keysound> keysounds = new ArrayList<Keysound>();
@@ -107,8 +94,8 @@ public class KeysoundProcessor {
 			ExecutorService executorService) throws IOException {
 
 		File mapsetFolder = keysoundsFile.getParentFile();
-		KeysoundWriter writer = new OggKeysoundWriter(mapsetFolder,
-				keysoundingStrategy, executorService);
+		KeysoundWriter writer = new KeysoundWriter(mapsetFolder,
+				keysoundingStrategy, new OggAudioEncoder(), executorService);
 
 		return new KeysoundExtractor(keysounds, writer, offset);
 	}

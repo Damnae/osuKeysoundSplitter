@@ -1,7 +1,7 @@
 package com.damnae.osukeysoundsplitter.strategy;
 
+import com.damnae.osukeysoundsplitter.Keysound;
 import com.damnae.osukeysoundsplitter.KeysoundCache;
-import com.damnae.osukeysoundsplitter.KeysoundProcessor.Keysound;
 import com.damnae.osukeysoundsplitter.pathprovider.CounterKeysoundPathProvider;
 
 public class ManiaKeysoundingStrategy extends BaseKeysoundingStrategy {

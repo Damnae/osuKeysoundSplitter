@@ -1,31 +1,31 @@
-package com.damnae.osukeysoundsplitter.writer;
+package com.damnae.osukeysoundsplitter;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
-import org.kc7bfi.jflac.metadata.StreamInfo;
-
+import com.damnae.osukeysoundsplitter.audio.AudioTrackInfo;
+import com.damnae.osukeysoundsplitter.audio.encode.AudioEncoder;
 import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
 import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
 
-public abstract class BaseKeysoundWriter implements KeysoundWriter {
+public class KeysoundWriter {
 	private File mapsetFolder;
 	private KeysoundingStrategy keysoundingStrategy;
+	private AudioEncoder audioEncoder;
 	private ExecutorService executorService;
 
-	public BaseKeysoundWriter(File mapsetFolder,
-			KeysoundingStrategy keysoundingStrategy,
+	public KeysoundWriter(File mapsetFolder,
+			KeysoundingStrategy keysoundingStrategy, AudioEncoder audioEncoder,
 			ExecutorService executorService) {
 
 		this.mapsetFolder = mapsetFolder;
 		this.keysoundingStrategy = keysoundingStrategy;
+		this.audioEncoder = audioEncoder;
 		this.executorService = executorService;
 	}
 
-	@Override
-	public String writeKeysound(final byte[] data, final StreamInfo streamInfo)
+	public String writeKeysound(final byte[] data, final AudioTrackInfo info)
 			throws IOException {
 
 		KeysoundPathProvider keysoundPathProvider = keysoundingStrategy
@@ -36,7 +36,7 @@ public abstract class BaseKeysoundWriter implements KeysoundWriter {
 				.isGenerated(keysoundIdentifier);
 
 		final String keysoundPath = keysoundPathProvider.getKeysoundPath(
-				keysoundIdentifier, getExtension());
+				keysoundIdentifier, audioEncoder.getExtension());
 
 		if (!isGenerated) {
 			executorService.execute(new Runnable() {
@@ -44,21 +44,11 @@ public abstract class BaseKeysoundWriter implements KeysoundWriter {
 				@Override
 				public void run() {
 					File keysoundFile = new File(mapsetFolder, keysoundPath);
-					keysoundFile.getParentFile().mkdirs();
 
 					System.out.println("Writing keysound "
 							+ keysoundFile.getPath());
 					try {
-						FileOutputStream os;
-						os = new FileOutputStream(keysoundFile);
-						try {
-							writeKeysound(os, data, streamInfo);
-
-						} catch (IOException e) {
-
-						} finally {
-							os.close();
-						}
+						audioEncoder.encode(keysoundFile, data, info);
 
 					} catch (IOException e) {
 						System.err.println("Failed to write keysound "
@@ -71,9 +61,4 @@ public abstract class BaseKeysoundWriter implements KeysoundWriter {
 
 		return keysoundPath;
 	}
-
-	protected abstract String getExtension();
-
-	protected abstract void writeKeysound(FileOutputStream os, byte[] data,
-			StreamInfo streamInfo) throws IOException;
 }
