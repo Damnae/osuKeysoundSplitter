@@ -61,31 +61,27 @@ public class KeysoundExtractor implements PCMProcessor {
 		int consumedSamples = 0;
 
 		// Check to move to the next keysound
-		if (keysoundIndex < keysounds.size() - 1) {
+		while (keysoundIndex < keysounds.size() - 1) {
 			Keysound nextKeysound = keysounds.get(keysoundIndex + 1);
 
-			if (nextKeysound.startTime <= endTime) {
-				++keysoundIndex;
-				try {
-					double timePercentage = (nextKeysound.startTime - startTime)
-							/ duration;
-					if (timePercentage < 0) {
-						// XXX why?
+			if (nextKeysound.startTime > endTime)
+				break;
 
-						System.err.println("negative timePercentage "
-								+ timePercentage);
-						timePercentage = 0;
-					}
+			++keysoundIndex;
+			try {
+				double timePercentage = (nextKeysound.startTime - startTime)
+						/ duration;
 
-					consumedSamples = (int) (timePercentage * samples);
+				int toSamples = (int) (timePercentage * samples);
 
-					if (keysoundIndex > 0)
-						writePCM(pcm, 0, consumedSamples);
-					startKeysound();
+				if (keysoundIndex > 0)
+					writePCM(pcm, consumedSamples, toSamples - consumedSamples);
+				startKeysound();
 
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
+				consumedSamples = toSamples;
+
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
 		}
 
