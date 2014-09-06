@@ -85,7 +85,8 @@ public class MapsetProcessor {
 						.process(diffFile, keysoundTrackFile, offset,
 								executorService);
 
-				keysoundTrackDecoder.register(keysoundExtractor);
+				if (keysoundExtractor != null)
+					keysoundTrackDecoder.register(keysoundExtractor);
 			}
 
 			keysoundTrackDecoder.decode();

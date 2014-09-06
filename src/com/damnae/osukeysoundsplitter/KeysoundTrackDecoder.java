@@ -3,6 +3,7 @@ package com.damnae.osukeysoundsplitter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,10 @@ public class KeysoundTrackDecoder {
 	}
 
 	public void register(KeysoundExtractor keysoundExtractor) {
+		if (keysoundExtractor == null)
+			throw new InvalidParameterException(
+					"keysoundExtractor must not be null");
+
 		keysoundExtractors.add(keysoundExtractor);
 	}
 
