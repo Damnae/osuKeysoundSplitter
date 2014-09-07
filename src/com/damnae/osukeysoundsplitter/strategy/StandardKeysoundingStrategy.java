@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.damnae.osukeysoundsplitter.Keysound;
+import com.damnae.osukeysoundsplitter.Keysound.Type;
 import com.damnae.osukeysoundsplitter.KeysoundCache;
 import com.damnae.osukeysoundsplitter.TimingPoint;
 import com.damnae.osukeysoundsplitter.Utils;
@@ -136,7 +137,9 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 	private void insertKeysounds(List<TimingPoint> timingPoints,
 			List<Keysound> keysounds) {
 
-		for (Keysound keysound : keysounds) {
+		for (int i = 0, size = keysounds.size(); i < size; ++i) {
+			Keysound keysound = keysounds.get(i);
+
 			boolean muteBody = keysound.type == Keysound.Type.LINE;
 			if (keysound.type == Keysound.Type.HITOBJECT) {
 				String[] keysoundDataLines = keysound.data.split("\n");
@@ -150,11 +153,15 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 				if (!Utils.isSlider(flags) && !Utils.isSpinner(flags))
 					continue;
 
-				muteBody = Utils.isSlider(flags);
+				muteBody = Utils.isSlider(flags) && i < size - 1
+						&& keysounds.get(i + 1).type != Type.HITOBJECT;
 
 			} else if (keysound.type != Keysound.Type.LINE) {
 				continue;
 			}
+
+			muteBody = muteBody && i < size - 1
+					&& keysounds.get(i + 1).type == Type.LINE;
 
 			long startTime = keysound.startTime;
 			long endTime = keysound.endTime;
