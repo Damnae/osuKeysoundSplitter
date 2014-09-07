@@ -153,8 +153,7 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 				if (!Utils.isSlider(flags) && !Utils.isSpinner(flags))
 					continue;
 
-				muteBody = Utils.isSlider(flags) && i < size - 1
-						&& keysounds.get(i + 1).type != Type.HITOBJECT;
+				muteBody = Utils.isSlider(flags);
 
 			} else if (keysound.type != Keysound.Type.LINE) {
 				continue;
