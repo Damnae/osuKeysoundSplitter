@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import com.damnae.osukeysoundsplitter.Keysound;
+import com.damnae.osukeysoundsplitter.TimingPoint;
 import com.damnae.osukeysoundsplitter.audio.encode.AudioEncoder;
 import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
 
@@ -36,9 +37,9 @@ public abstract class BaseKeysoundingStrategy implements KeysoundingStrategy {
 	}
 
 	@Override
-	public List<String> rewriteTimingPoints(List<String> timingPointLines,
+	public List<String> rewriteTimingPoints(List<TimingPoint> timingPoints,
 			List<Keysound> keysounds) {
 
-		return timingPointLines;
+		return TimingPoint.buildTimingPointLines(timingPoints);
 	}
 }

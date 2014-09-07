@@ -2,7 +2,6 @@ package com.damnae.osukeysoundsplitter.strategy;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -96,33 +95,13 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 	}
 
 	@Override
-	public List<String> rewriteTimingPoints(List<String> timingPointLines,
+	public List<String> rewriteTimingPoints(List<TimingPoint> timingPoints,
 			List<Keysound> keysounds) {
 
-		List<TimingPoint> timingPoints = parseTimingPoints(timingPointLines);
 		removeKeysounding(timingPoints);
 		insertKeysounds(timingPoints, keysounds);
 
 		return TimingPoint.buildTimingPointLines(timingPoints);
-	}
-
-	private List<TimingPoint> parseTimingPoints(List<String> timingPointLines) {
-		List<TimingPoint> timingPoints = new ArrayList<TimingPoint>(
-				timingPointLines.size());
-
-		double previousNonInheritedBeatDuration = 0;
-		for (String timingPointLine : timingPointLines) {
-			TimingPoint timingPoint = TimingPoint.parseTimingPoint(
-					timingPointLine, previousNonInheritedBeatDuration);
-
-			if (!timingPoint.isInherited)
-				previousNonInheritedBeatDuration = timingPoint.secondValue;
-			timingPoints.add(timingPoint);
-		}
-
-		TimingPoint.sortTimingPoints(timingPoints);
-
-		return timingPoints;
 	}
 
 	private void removeKeysounding(List<TimingPoint> timingPoints) {

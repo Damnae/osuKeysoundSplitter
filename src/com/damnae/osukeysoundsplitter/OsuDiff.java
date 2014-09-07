@@ -33,7 +33,7 @@ public class OsuDiff {
 	}
 
 	public List<DiffEvent> diffEvents = new ArrayList<DiffEvent>();
-	private List<TimingPoint> timingPoints = new ArrayList<TimingPoint>();
+	public List<TimingPoint> timingPoints = new ArrayList<TimingPoint>();
 	private double sliderMultiplier;
 
 	public OsuDiff(File file) throws IOException {

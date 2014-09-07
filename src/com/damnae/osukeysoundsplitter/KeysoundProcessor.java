@@ -23,6 +23,7 @@ public class KeysoundProcessor {
 
 	private KeysoundingStrategy keysoundingStrategy;
 	private List<Keysound> keysounds = new ArrayList<Keysound>();
+	private List<TimingPoint> timingPoints = new ArrayList<TimingPoint>();
 	private List<String> keysoundFiles = new ArrayList<String>();
 
 	public KeysoundProcessor(KeysoundingStrategy keysoundingStrategy) {
@@ -37,6 +38,8 @@ public class KeysoundProcessor {
 		if (diffKeysounds.isEmpty())
 			return null;
 
+		timingPoints.addAll(osuDiff.timingPoints);
+
 		KeysoundExtractor keysoundExtractor = getKeysoundExtractor(
 				keysoundsFile, diffKeysounds, offset, executorService);
 
@@ -47,7 +50,10 @@ public class KeysoundProcessor {
 	}
 
 	public void insertKeysounds(File diffFile) throws IOException {
-		insertKeysounds(diffFile, keysounds, keysoundFiles);
+		TimingPoint.sortTimingPoints(timingPoints);
+		TimingPoint.simplifyTimingPoints(timingPoints);
+
+		insertKeysounds(diffFile, keysounds, timingPoints, keysoundFiles);
 		keysounds.clear();
 		keysoundFiles.clear();
 	}
@@ -99,7 +105,8 @@ public class KeysoundProcessor {
 	}
 
 	private void insertKeysounds(File diffFile, List<Keysound> keysounds,
-			List<String> keysoundFolderPaths) throws IOException {
+			List<TimingPoint> timingPoints, List<String> keysoundFolderPaths)
+			throws IOException {
 
 		// The file is assumed to exist at this point
 		File backupFile = new File(diffFile.getCanonicalPath() + ".bak");
@@ -116,7 +123,6 @@ public class KeysoundProcessor {
 		}
 
 		List<String> lines = retrieveLines(diffFile);
-		List<String> timingPointLines = new ArrayList<String>();
 		FileOutputStream os = new FileOutputStream(diffFile);
 		try {
 			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(os,
@@ -130,8 +136,8 @@ public class KeysoundProcessor {
 					if (line.length() == 0 && sectionName != null) {
 						// Leave section
 						if (sectionName.equals("TimingPoints")) {
-							timingPointLines = keysoundingStrategy
-									.rewriteTimingPoints(timingPointLines,
+							List<String> timingPointLines = keysoundingStrategy
+									.rewriteTimingPoints(timingPoints,
 											keysounds);
 
 							for (String timingPointLine : timingPointLines) {
@@ -187,10 +193,9 @@ public class KeysoundProcessor {
 								}
 							}
 
-						} else if (sectionName.equals("TimingPoints")) {
-							timingPointLines.add(line);
+						} else if (!sectionName.equals("HitObjects")
+								&& !sectionName.equals("TimingPoints")) {
 
-						} else if (!sectionName.equals("HitObjects")) {
 							writer.append(line);
 							writer.newLine();
 						}
