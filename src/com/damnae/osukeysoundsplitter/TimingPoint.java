@@ -45,7 +45,8 @@ public class TimingPoint {
 	}
 
 	public boolean isSimilar(TimingPoint previousTimingPoint) {
-		if (getBeatDuration() != previousTimingPoint.getBeatDuration()
+		if (!isInherited && previousTimingPoint.isInherited
+				|| getBeatDuration() != previousTimingPoint.getBeatDuration()
 				|| getMultiplier() != previousTimingPoint.getMultiplier()
 				|| beatPerMeasure != previousTimingPoint.beatPerMeasure
 				|| sampleType != previousTimingPoint.sampleType
@@ -129,8 +130,7 @@ public class TimingPoint {
 			TimingPoint timingPoint = timingPoints.get(i);
 			if (previousTimingPoint != null) {
 
-				if (timingPoint.isInherited
-						&& timingPoint.isSimilar(previousTimingPoint)) {
+				if (timingPoint.isSimilar(previousTimingPoint)) {
 
 					timingPoints.remove(i);
 					continue;
