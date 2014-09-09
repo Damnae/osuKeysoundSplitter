@@ -3,6 +3,7 @@
 
 ## How to
 
+* [Download the latest release.](https://github.com/Damnae/osuKeysoundSplitter/releases)
 * [Generate a voice-only 16bit flac from a song and its instrumental version.](http://www.howtogeek.com/61250/how-to-isolate-and-save-vocals-from-music-tracks-using-audacity/)
 * Also export both the synchronized instrumental and complete song separately (@192kb/s).
 * Import the instrumental in osu! and time it.
@@ -12,7 +13,7 @@
 * Place bookmarks where the voice parts start and end, each pair of bookmarks describe a section that will have keysounds. Bookmarks can also be used to cut breathing sounds from the notes, see how they are placed in [this map](https://osu.ppy.sh/s/208734).
 * Place keysound.bat and the jar in the mapset's folder and run keysound.bat. You can also use this command:
 ```
-java -jar "osu!KeysoundSplitter.jar" mapsetPath keysoundsOffsetInMilliseconds
+java -jar "osu!KeysoundSplitter.jar" "mapsetPath" keysoundsOffsetInMilliseconds
 ```
 
 ## FAQTS
