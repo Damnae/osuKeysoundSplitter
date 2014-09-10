@@ -89,7 +89,7 @@ public class TimingPoint {
 					+ timingPointLine);
 
 		TimingPoint timingPoint = new TimingPoint();
-		timingPoint.time = Long.parseLong(values[0]);
+		timingPoint.time = (long) Double.parseDouble(values[0]);
 		timingPoint.secondValue = Double.parseDouble(values[1]);
 		timingPoint.beatPerMeasure = values.length > 2 ? Integer
 				.parseInt(values[2]) : 4;
