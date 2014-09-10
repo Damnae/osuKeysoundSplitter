@@ -10,7 +10,10 @@
 * Add the voice flac inside the map's folder.
 * Make a copy of the diff and make it use the complete song's mp3. The name of diff should be suffixed with the flac name: if your diff is called `NM`, and the flac `voice.flac`, call this diff `NM -voice`.
 * Place notes over the voice on this diff.
-* Place bookmarks where the voice parts start and end, each pair of bookmarks describe a section that will have keysounds. Bookmarks can also be used to cut breathing sounds from the notes, see how they are placed in [this map](https://osu.ppy.sh/s/208734).
+* Place bookmarks at the end of mapped sections, where the voice stops. They can also be used to cut breathing sounds from notes. See how they are placed in [this map](https://osu.ppy.sh/s/209865): 
+ * *00:10:898 (3) -* "ni", will play when the note is hit / *00:11:131 -* breathing sound, will play automatically / *00:10:898 (3) -* "a", will play when the note is hit.
+ * *00:21:131 (3) -* "de", will play when the note is hit / *00:21:596 -* stops the "de" sound, nothing will play here / *00:21:828 -* breathing sound, will play automatically / *00:22:293 (1) -* "a", will play when the note is hit.
+ * *01:21:131 -* end of last mapped voice sample.
 * Place keysound.bat and the jar in the mapset's folder and run keysound.bat. You can also use this command:
 ```
 java -jar "osu!KeysoundSplitter.jar" "mapsetPath" keysoundsOffsetInMilliseconds
