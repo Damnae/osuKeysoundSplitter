@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.damnae.osukeysoundsplitter.audio.decode.AudioDecoder;
 import com.damnae.osukeysoundsplitter.audio.decode.FlacAudioDecoder;
-import com.damnae.osukeysoundsplitter.audio.encode.OggAudioEncoder;
+import com.damnae.osukeysoundsplitter.audio.encode.AudioEncoder;
 import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
 import com.damnae.osukeysoundsplitter.strategy.StandardKeysoundingStrategy;
 
@@ -29,7 +29,8 @@ public class MapsetProcessor {
 		}
 	}
 
-	public void process(File folder, int offset) throws IOException {
+	public void process(File folder, int offset, AudioEncoder audioEncoder)
+			throws IOException {
 		long startTime = System.nanoTime();
 
 		System.out.println("Processing mapset in " + folder.getCanonicalPath());
@@ -57,10 +58,9 @@ public class MapsetProcessor {
 		Map<String, DiffContext> diffContexts = new HashMap<String, DiffContext>();
 
 		KeysoundingStrategy keysoundingStrategy = new StandardKeysoundingStrategy(
-				folder, keysoundCache, new OggAudioEncoder(), 100);
+				folder, keysoundCache, audioEncoder, 100);
 		// KeysoundingStrategy keysoundingStrategy = new
-		// ManiaKeysoundingStrategy(
-		// folder, keysoundCache, new OggAudioEncoder(), "ks");
+		// ManiaKeysoundingStrategy(folder, keysoundCache, audioEncoder, "ks");
 
 		for (File keysoundTrackFile : keysoundTrackFiles) {
 			String keysoundTrackName = getKeysoundTrackName(keysoundTrackFile);

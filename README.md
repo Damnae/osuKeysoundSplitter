@@ -14,9 +14,9 @@
  * *00:10:898 (3) -* "ni", will play when the note is hit / *00:11:131 -* breathing sound, will play automatically / *00:10:898 (3) -* "a", will play when the note is hit.
  * *00:21:131 (3) -* "de", will play when the note is hit / *00:21:596 -* stops the "de" sound, nothing will play here / *00:21:828 -* breathing sound, will play automatically / *00:22:293 (1) -* "a", will play when the note is hit.
  * *01:21:131 -* end of last mapped voice sample.
-* Place keysound.bat and the jar in the mapset's folder and run keysound.bat. You can also use this command:
+* Place keysoundOgg.bat/keysoundWav.bat and the jar in the mapset's folder and run keysoundOgg.bat or keysoundWav.bat depending on the format you want. You can also use this command:
 ```
-java -jar "osu!KeysoundSplitter.jar" "mapsetPath" keysoundsOffsetInMilliseconds
+java -jar "osu!KeysoundSplitter.jar" "mapsetPath" keysoundsOffsetInMilliseconds encodingFormat
 ```
 
 ## FAQTS
