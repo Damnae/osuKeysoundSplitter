@@ -138,6 +138,9 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 				continue;
 			}
 
+			boolean makeSilentSlide = muteBody;
+			
+			// Only mute hitsounds inside sliders
 			muteBody = muteBody && i < size - 1
 					&& keysounds.get(i + 1).type == Type.LINE;
 
@@ -161,7 +164,9 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 				TimingPoint silentTimingPoint = TimingPoint
 						.getOrCreateTimingPoint(timingPoints, startTime + 10);
 				silentTimingPoint.volume = 5;
-
+			}
+			
+			if (makeSilentSlide) {
 				// Make silent slider slide sample
 				String sliderSliderPath = HitnormalKeysoundPathProvider
 						.getSampleTypeName(timingPoint.sampleType)
@@ -169,12 +174,12 @@ public class StandardKeysoundingStrategy extends BaseKeysoundingStrategy {
 						+ timingPoint.sampleSet
 						+ "."
 						+ silentAudioEncoder.getExtension();
-
+	
 				File silentFile = new File(getMapsetFolder(), sliderSliderPath);
 				if (!silentFile.exists()) {
 					try {
 						silentAudioEncoder.encodeSilence(silentFile);
-
+	
 					} catch (IOException e) {
 						throw new RuntimeException(e);
 					}
