@@ -179,9 +179,11 @@ public class TimingPoint {
 
 			@Override
 			public int compare(TimingPoint t1, TimingPoint t2) {
+				// Earlier timing points first
 				int value = (int) (t1.time - t2.time);
+				// Uninherited timing points first
 				if (value == 0)
-					value = (t1.isInherited ? 0 : 1) - (t2.isInherited ? 0 : 1);
+					value = (t2.isInherited ? 0 : 1) - (t1.isInherited ? 0 : 1);
 				return value;
 			}
 		});
