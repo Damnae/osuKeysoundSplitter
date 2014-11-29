@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public class TimingPoint {
+	private static final int TIMING_POINT_LENIENCY = 5; //ms
+	
 	public long time;
 	public double secondValue;
 	public int beatPerMeasure;
@@ -149,7 +151,7 @@ public class TimingPoint {
 
 		TimingPoint currentTimingPoint = timingPoints.get(0);
 		for (TimingPoint timingsPoint : timingPoints) {
-			if (timingsPoint.time - 1 < time) {
+			if (timingsPoint.time - time <= TIMING_POINT_LENIENCY) {
 				currentTimingPoint = timingsPoint;
 
 			} else {
@@ -165,7 +167,7 @@ public class TimingPoint {
 
 		TimingPoint timingPoint = getTimingPointAtTime(timingPoints, time);
 
-		if (Math.abs(timingPoint.time - time) > 1) {
+		if (Math.abs(timingPoint.time - time) > TIMING_POINT_LENIENCY) {
 			timingPoint = timingPoint.createInherited(time);
 			timingPoints.add(timingPoint);
 		}
