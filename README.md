@@ -3,7 +3,7 @@
 
 ## How to
 
-* [Download the latest release.](https://github.com/Damnae/osuKeysoundSplitter/releases)
+* [Download the latest release.](https://github.com/Damnae/osuKeysoundSplitter/releases/latest)
 * [Generate a voice-only 16bit flac from a song and its instrumental version.](http://www.howtogeek.com/61250/how-to-isolate-and-save-vocals-from-music-tracks-using-audacity/)
 * Also export both the synchronized instrumental and complete song separately (@192kb/s).
 * Import the instrumental in osu! and time it.
