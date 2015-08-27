@@ -52,7 +52,7 @@ namespace osuKeysoundSplitter.PathProvider
             {
                 char c = path[i];
                 if (!(c >= '0' && c <= '9'))
-                    return Integer.valueOf(path.Substring(i + 1, endPosition));
+                    return int.Parse(path.Substring(i + 1, endPosition));
 
             }
             return 0;
@@ -71,7 +71,7 @@ namespace osuKeysoundSplitter.PathProvider
         public static String getSampleTypeName(int sampleType)
         {
             if (sampleType < 1 || sampleType > sampleTypeNames.Length)
-                throw new InvalidParameterException(String.ValueOf(sampleType));
+                throw new InvalidParameterException(sampleType.ToString());
 
             return sampleTypeNames[sampleType - 1];
         }

@@ -31,6 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>osuKeysoundSplitter.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -55,7 +58,6 @@
     <Compile Include="KeysoundExtractor.cs" />
     <Compile Include="KeysoundProcessor.cs" />
     <Compile Include="KeysoundWriter.cs" />
-    <Compile Include="Main.cs" />
     <Compile Include="MapsetProcessor.cs" />
     <Compile Include="OsuDiff.cs" />
     <Compile Include="PathProvider\AdditionsKeysoundPathProvider.cs" />

@@ -1,12 +1,14 @@
 
+using System.Collections.Generic;
 namespace osuKeysoundSplitter
 {
-public class KeysoundCache {
-	private File keysoundCacheFile;
-	private Map<String, String> keysoundPaths = new HashMap<String, String>();
-	private Set<String> unusedIdentifiers = new HashSet<String>();
+    public class KeysoundCache
+    {
+        private File keysoundCacheFile;
+        private Dictionary<string, string> keysoundPaths = new Dictionary<string, string>();
+        private Set<string> unusedIdentifiers = new HashSet<string>();
 
-	public KeysoundCache(File keysoundCacheFile) throws IOException {
+        public KeysoundCache(File keysoundCacheFile) {
 		this.keysoundCacheFile = keysoundCacheFile;
 
 		if (keysoundCacheFile.exists()) {
@@ -16,13 +18,13 @@ public class KeysoundCache {
 						Charset.forName("UTF-8"));
 				BufferedReader reader = new BufferedReader(inputStreamReader);
 				try {
-					String line;
+					string line;
 					while ((line = reader.readLine()) != null) {
-						line = line.trim();
+						line = line.Trim();
 
-						String[] keyVal = Utils.splitValues(line, '=');
-						String identifier = keyVal[0];
-						String path = keyVal[1];
+						string[] keyVal = Utils.splitValues(line, '=');
+						string identifier = keyVal[0];
+						string path = keyVal[1];
 
 						File keysoundFile = new File(
 								keysoundCacheFile.getParentFile(), path);
@@ -30,7 +32,7 @@ public class KeysoundCache {
 						if (!keysoundFile.exists())
 							continue;
 
-						keysoundPaths.put(identifier, path);
+						keysoundPaths|identifier] = path;
 						unusedIdentifiers.add(identifier);
 					}
 
@@ -44,54 +46,67 @@ public class KeysoundCache {
 		}
 	}
 
-	public boolean hasKeysound(String keysoundIdentifier) {
-		return keysoundPaths.containsKey(keysoundIdentifier);
-	}
+        public bool hasKeysound(string keysoundIdentifier)
+        {
+            return keysoundPaths.ContainsKey(keysoundIdentifier);
+        }
 
-	public boolean isPathAvailable(String path) {
-		return !keysoundPaths.containsValue(path);
-	}
+        public bool isPathAvailable(string path)
+        {
+            return !keysoundPaths.ContainsValue(path);
+        }
 
-	public String getKeysoundPath(String keysoundIdentifier) {
-		unusedIdentifiers.remove(keysoundIdentifier);
-		return keysoundPaths.get(keysoundIdentifier);
-	}
+        public string getKeysoundPath(string keysoundIdentifier)
+        {
+            unusedIdentifiers.remove(keysoundIdentifier);
+            return keysoundPaths.get(keysoundIdentifier);
+        }
 
-	public void register(String keysoundIdentifier, String keysoundPath) {
-		keysoundPaths.put(keysoundIdentifier, keysoundPath);
-	}
+        public void register(string keysoundIdentifier, string keysoundPath)
+        {
+            keysoundPaths.put(keysoundIdentifier, keysoundPath);
+        }
 
-	public void update() throws IOException {
-		for (String unusedIdentifier : unusedIdentifiers) {
-			File keysoundFile = new File(keysoundCacheFile.getParentFile(),
-					keysoundPaths.get(unusedIdentifier));
+        public void update()
+        {
+            foreach (string unusedIdentifier in unusedIdentifiers)
+            {
+                File keysoundFile = new File(keysoundCacheFile.getParentFile(),
+                        keysoundPaths.get(unusedIdentifier));
 
-			keysoundPaths.remove(unusedIdentifier);
-			keysoundFile.delete();
-		}
+                keysoundPaths.remove(unusedIdentifier);
+                keysoundFile.delete();
+            }
 
-		FileOutputStream os = new FileOutputStream(keysoundCacheFile);
-		try {
-			OutputStreamWriter inputStreamReader = new OutputStreamWriter(os,
-					Charset.forName("UTF-8"));
-			BufferedWriter writer = new BufferedWriter(inputStreamReader);
-			try {
-				for (Entry<String, String> keysoundPathEntry : keysoundPaths
-						.entrySet()) {
+            FileOutputStream os = new FileOutputStream(keysoundCacheFile);
+            try
+            {
+                OutputStreamWriter inputStreamReader = new OutputStreamWriter(os,
+                        Charset.forName("UTF-8"));
+                BufferedWriter writer = new BufferedWriter(inputStreamReader);
+                try
+                {
+                    foreach (Entry<string, string> keysoundPathEntry in keysoundPaths
+                            .entrySet())
+                    {
 
-					writer.write(keysoundPathEntry.getKey());
-					writer.write('=');
-					writer.write(keysoundPathEntry.getValue());
-					writer.write('\n');
-				}
+                        writer.write(keysoundPathEntry.getKey());
+                        writer.write('=');
+                        writer.write(keysoundPathEntry.getValue());
+                        writer.write('\n');
+                    }
 
-			} finally {
-				writer.close();
-			}
+                }
+                finally
+                {
+                    writer.close();
+                }
 
-		} finally {
-			os.close();
-		}
-	}
-}
+            }
+            finally
+            {
+                os.close();
+            }
+        }
+    }
 }

@@ -59,7 +59,7 @@ namespace osuKeysoundSplitter.PathProvider
             {
                 char c = path[i];
                 if (!(c >= '0' && c <= '9'))
-                    return Integer.valueOf(path.Substring(i + 1, endPosition));
+                    return int.Parse(path.Substring(i + 1, endPosition));
             }
             return 0;
         }

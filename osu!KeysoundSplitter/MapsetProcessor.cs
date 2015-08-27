@@ -7,8 +7,8 @@ namespace osuKeysoundSplitter
 {
 public class MapsetProcessor {
 
-	private static const String KEYSOUND_TRACK_EXTENSION = ".flac";
-	private static const String DIFF_FILE_EXTENSION = ".osu";
+	private static const string KEYSOUND_TRACK_EXTENSION = ".flac";
+	private static const string DIFF_FILE_EXTENSION = ".osu";
 
 	private class DiffContext {
 		public KeysoundProcessor keysoundProcessor;
@@ -18,22 +18,20 @@ public class MapsetProcessor {
 		}
 	}
 
-	public void process(File folder, int offset, AudioEncoder audioEncoder)
+	public void process(string folder, int offset, AudioEncoder audioEncoder)
 			 {
 		long startTime = System.nanoTime();
 
 		System.out.println("Processing mapset in " + folder.getCanonicalPath());
 
 		File[] keysoundTrackFiles = folder.listFiles(new FilenameFilter() {
-			@Override
-			public bool accept(File dir, string name) {
+			public override bool accept(File dir, string name) {
 				return name.endsWith(KEYSOUND_TRACK_EXTENSION);
 			}
 		});
 
 		File[] diffFiles = folder.listFiles(new FilenameFilter() {
-			@Override
-			public bool accept(File dir, String name) {
+			public override bool accept(File dir, String name) {
 				return name.endsWith(DIFF_FILE_EXTENSION);
 			}
 		});
@@ -44,7 +42,7 @@ public class MapsetProcessor {
 		ExecutorService executorService = Executors.newFixedThreadPool(Math
 				.max(1, Runtime.getRuntime().availableProcessors() - 1));
 
-		Map<String, DiffContext> diffContexts = new HashMap<String, DiffContext>();
+		Map<String, DiffContext> diffContexts = new Dictionary<string, DiffContext>();
 
 		KeysoundingStrategy keysoundingStrategy = new StandardKeysoundingStrategy(
 				folder, keysoundCache, audioEncoder, 100);

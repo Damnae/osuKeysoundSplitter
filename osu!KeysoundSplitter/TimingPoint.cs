@@ -82,27 +82,21 @@ public class TimingPoint {
 	public static TimingPoint parseTimingPoint(string timingPointLine,
 			double previousNonInheritedBeatDuration) {
 
-		string[] values = timingPointLine.Split(",");
+		string[] values = timingPointLine.Split(',');
 
 		if (values.Length < 2)
 			throw new Exception("Timing point has less than 2 values: "
 					+ timingPointLine);
 
 		TimingPoint timingPoint = new TimingPoint();
-		timingPoint.time = (long) Double.parseDouble(values[0]);
-		timingPoint.secondValue = Double.parseDouble(values[1]);
-		timingPoint.beatPerMeasure = values.Length > 2 ? Integer
-				.parseInt(values[2]) : 4;
-		timingPoint.sampleType = values.Length > 3 ? Integer
-				.parseInt(values[3]) : 1;
-		timingPoint.sampleSet = values.Length > 4 ? Integer.parseInt(values[4])
-				: 1;
-		timingPoint.volume = values.Length > 5 ? Integer.parseInt(values[5])
-				: 100;
-		timingPoint.isInherited = values.Length > 6 ? Integer
-				.parseInt(values[6]) == 0 : false;
-		timingPoint.isKiai = values.Length > 7 ? Integer.parseInt(values[7]) != 0
-				: false;
+		timingPoint.time = (long) double.Parse(values[0]);
+		timingPoint.secondValue = double.Parse(values[1]);
+		timingPoint.beatPerMeasure = values.Length > 2 ? int.Parse(values[2]) : 4;
+		timingPoint.sampleType = values.Length > 3 ? int.Parse(values[3]) : 1;
+		timingPoint.sampleSet = values.Length > 4 ? int.Parse(values[4]) : 1;
+		timingPoint.volume = values.Length > 5 ? int.Parse(values[5]) : 100;
+		timingPoint.isInherited = values.Length > 6 ? int.Parse(values[6]) == 0 : false;
+		timingPoint.isKiai = values.Length > 7 ? int.Parse(values[7]) != 0 : false;
 
 		if (timingPoint.isInherited)
 			timingPoint.prevousBeatDuration = previousNonInheritedBeatDuration;

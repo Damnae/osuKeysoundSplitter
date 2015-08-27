@@ -20,18 +20,18 @@ namespace osuKeysoundSplitter.Strategy
                 int volume)
         {
 
-            string[] values = keysoundData.Split(",");
-            int flags = Integer.parseInt(values[3]);
+            string[] values = keysoundData.Split(',');
+            int flags = int.Parse(values[3]);
 
             if (Utils.isNoteOrCircle(flags))
             {
                 string[] hitsoundValues = Utils.splitValues(values[5], ':');
-                hitsoundValues[0] = string.valueOf(HitnormalKeysoundPathProvider
-                        .getSampleType(keysound.filename));
+                hitsoundValues[0] = HitnormalKeysoundPathProvider
+                        .getSampleType(keysound.filename);
                 hitsoundValues[1] = "0";
-                hitsoundValues[2] = string.valueOf(HitnormalKeysoundPathProvider
-                        .getSampleSet(keysound.filename));
-                hitsoundValues[3] = string.valueOf(volume);
+                hitsoundValues[2] = HitnormalKeysoundPathProvider
+                        .getSampleSet(keysound.filename);
+                hitsoundValues[3] = volume.ToString();
                 hitsoundValues[4] = "";
 
                 values[4] = "0";
@@ -42,12 +42,12 @@ namespace osuKeysoundSplitter.Strategy
             else if (Utils.isLongNote(flags))
             {
                 string[] lnValues = Utils.splitValues(values[5], ':');
-                lnValues[1] = string.valueOf(HitnormalKeysoundPathProvider
-                        .getSampleType(keysound.filename));
+                lnValues[1] = HitnormalKeysoundPathProvider
+                        .getSampleType(keysound.filename);
                 lnValues[2] = "0";
-                lnValues[3] = string.valueOf(HitnormalKeysoundPathProvider
-                        .getSampleSet(keysound.filename));
-                lnValues[4] = string.valueOf(volume);
+                lnValues[3] = HitnormalKeysoundPathProvider
+                        .getSampleSet(keysound.filename);
+                lnValues[4] = volume.ToString();
                 lnValues[5] = "";
 
                 values[4] = "0";
@@ -60,7 +60,7 @@ namespace osuKeysoundSplitter.Strategy
                 if (values.Length < 10)
                     values = Arrays.copyOf(values, 10);
 
-                int nodeCount = Integer.parseInt(values[6]) + 1;
+                int nodeCount = int.Parse(values[6]) + 1;
 
                 string[] additionValues = new string[nodeCount];
                 for (int i = 0; i < nodeCount; ++i)
@@ -129,8 +129,8 @@ namespace osuKeysoundSplitter.Strategy
                         continue;
 
                     string keysoundData = keysoundDataLines[0];
-                    string[] values = keysoundData.Split(",");
-                    int flags = Integer.parseInt(values[3]);
+                    string[] values = keysoundData.Split(',');
+                    int flags = int.Parse(values[3]);
 
                     if (!Utils.isSlider(flags) && !Utils.isSpinner(flags))
                         continue;
@@ -147,7 +147,7 @@ namespace osuKeysoundSplitter.Strategy
 
                 // Only mute hitsounds inside sliders
                 muteBody = muteBody && i < size - 1
-                        && keysounds[i + 1].type == Type.LINE;
+                        && keysounds[i + 1].type == Keysound.Type.LINE;
 
                 long startTime = keysound.startTime;
                 long endTime = keysound.endTime;

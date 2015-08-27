@@ -36,20 +36,20 @@ public class OsuDiff {
 
 			string line;
 			while ((line = reader.readLine()) != null) {
-				line = line.trim();
-				if (line.startsWith("[") && line.endsWith("]")) {
-					string sectionName = line.substring(1, line.length() - 1);
+				line = line.Trim();
+				if (line.StartsWith("[") && line.EndsWith("]")) {
+					string sectionName = line.Substring(1, line.Length - 1);
 
-					if (sectionName.equals("Editor")) {
+					if (sectionName == "Editor") {
 						parseOsuEditorSection(reader);
 
-					} else if (sectionName.equals("Difficulty")) {
+					} else if (sectionName == "Difficulty") {
 						parseOsuDifficultySection(reader);
 
-					} else if (sectionName.equals("TimingPoints")) {
+					} else if (sectionName == "TimingPoints") {
 						parseOsuTimingPointsSection(reader);
 
-					} else if (sectionName.equals("HitObjects")) {
+					} else if (sectionName == "HitObjects") {
 						parseOsuHitObjectsSection(reader);
 					}
 				}
@@ -61,8 +61,7 @@ public class OsuDiff {
 
 		Collections.sort(diffEvents, new Comparator<DiffEvent>() {
 
-			@Override
-			public int compare(DiffEvent event1, DiffEvent event2) {
+			public override int compare(DiffEvent event1, DiffEvent event2) {
 				int value = (int) (event1.time - event2.time);
 				if (value == 0)
 					value = (event1.data != null ? 1 : 0)
