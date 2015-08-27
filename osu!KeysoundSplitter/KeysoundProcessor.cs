@@ -1,55 +1,41 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-
-import com.damnae.osukeysoundsplitter.OsuDiff.DiffEvent;
-import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
+using osuKeysoundSplitter.Strategy;
+using System.Collections.Generic;
+using System.IO;
 
 namespace osuKeysoundSplitter
 {
 public class KeysoundProcessor {
-	private static final long SHORT_AUDIO_AREA_THRESHOLD = 10; // ms
+	private static const long SHORT_AUDIO_AREA_THRESHOLD = 10; // ms
 
 	private KeysoundingStrategy keysoundingStrategy;
-	private List<Keysound> keysounds = new ArrayList<Keysound>();
-	private List<TimingPoint> timingPoints = new ArrayList<TimingPoint>();
-	private List<String> keysoundFiles = new ArrayList<String>();
+	private List<Keysound> keysounds = new List<Keysound>();
+	private List<TimingPoint> timingPoints = new List<TimingPoint>();
+	private List<string> keysoundFiles = new List<string>();
 
 	public KeysoundProcessor(KeysoundingStrategy keysoundingStrategy) {
 		this.keysoundingStrategy = keysoundingStrategy;
 	}
 
 	public KeysoundExtractor process(File diffFile, File keysoundsFile,
-			int offset, ExecutorService executorService) throws IOException {
+			int offset, ExecutorService executorService) {
 
 		OsuDiff osuDiff = new OsuDiff(diffFile);
 		List<Keysound> diffKeysounds = getKeysounds(osuDiff);
-		if (diffKeysounds.isEmpty())
+		if (diffKeysounds.Count == 0)
 			return null;
 
-		timingPoints.addAll(osuDiff.timingPoints);
+		timingPoints.AddRange(osuDiff.timingPoints);
 
 		KeysoundExtractor keysoundExtractor = getKeysoundExtractor(
 				keysoundsFile, diffKeysounds, offset, executorService);
 
-		keysounds.addAll(diffKeysounds);
-		keysoundFiles.add(Utils.getFileNameWithoutExtension(keysoundsFile));
+		keysounds.AddRange(diffKeysounds);
+		keysoundFiles.Add(Utils.getFileNameWithoutExtension(keysoundsFile));
 
 		return keysoundExtractor;
 	}
 
-	public void insertKeysounds(File diffFile) throws IOException {
+	public void insertKeysounds(File diffFile)  {
 		TimingPoint.sortTimingPoints(timingPoints);
 		TimingPoint.simplifyTimingPoints(timingPoints);
 
@@ -59,14 +45,14 @@ public class KeysoundProcessor {
 	}
 
 	private List<Keysound> getKeysounds(OsuDiff osuDiff) {
-		List<Keysound> keysounds = new ArrayList<Keysound>();
+		List<Keysound> keysounds = new List<Keysound>();
 
-		boolean inSoundSection = false;
-		for (int i = 0, size = osuDiff.diffEvents.size(); i < size - 1; ++i) {
-			DiffEvent diffEvent = osuDiff.diffEvents.get(i);
-			DiffEvent nextDiffEvent = osuDiff.diffEvents.get(i + 1);
+		bool inSoundSection = false;
+		for (int i = 0, size = osuDiff.diffEvents.Count; i < size - 1; ++i) {
+			osuKeysoundSplitter.OsuDiff.DiffEvent diffEvent = osuDiff.diffEvents[i];
+			osuKeysoundSplitter.OsuDiff.DiffEvent nextDiffEvent = osuDiff.diffEvents[i + 1];
 
-			boolean isSplittingPoint = diffEvent.isSplittingPoint();
+			bool isSplittingPoint = diffEvent.isSplittingPoint();
 			if (isSplittingPoint)
 				inSoundSection = !nextDiffEvent.isSplittingPoint()
 						|| !inSoundSection;
@@ -76,7 +62,7 @@ public class KeysoundProcessor {
 			if (!inSoundSection)
 				continue;
 
-			boolean isAutosound = isSplittingPoint;
+			bool isAutosound = isSplittingPoint;
 
 			long duration = nextDiffEvent.time - diffEvent.time;
 			if (isAutosound && duration < SHORT_AUDIO_AREA_THRESHOLD)
@@ -88,7 +74,7 @@ public class KeysoundProcessor {
 			keysound.type = isAutosound ? Keysound.Type.AUTO : diffEvent
 					.isLine() ? Keysound.Type.LINE : Keysound.Type.HITOBJECT;
 			keysound.data = diffEvent.data;
-			keysounds.add(keysound);
+			keysounds.Add(keysound);
 		}
 
 		return keysounds;
@@ -96,7 +82,7 @@ public class KeysoundProcessor {
 
 	private KeysoundExtractor getKeysoundExtractor(File keysoundsFile,
 			List<Keysound> keysounds, int offset,
-			ExecutorService executorService) throws IOException {
+			ExecutorService executorService) {
 
 		KeysoundWriter writer = new KeysoundWriter(keysoundingStrategy,
 				executorService);
@@ -105,8 +91,8 @@ public class KeysoundProcessor {
 	}
 
 	private void insertKeysounds(File diffFile, List<Keysound> keysounds,
-			List<TimingPoint> timingPoints, List<String> keysoundFolderPaths)
-			throws IOException {
+			List<TimingPoint> timingPoints, List<string> keysoundFolderPaths)
+			 {
 
 		// The file is assumed to exist at this point
 		File backupFile = new File(diffFile.getCanonicalPath() + ".bak");
@@ -122,25 +108,25 @@ public class KeysoundProcessor {
 			Files.copy(diffFile.toPath(), backupFile.toPath());
 		}
 
-		List<String> lines = retrieveLines(diffFile);
+		List<string> lines = retrieveLines(diffFile);
 		FileOutputStream os = new FileOutputStream(diffFile);
 		try {
 			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(os,
 					Charset.forName("UTF-8"));
 			BufferedWriter writer = new BufferedWriter(outputStreamWriter);
 
-			String sectionName = null;
+			string sectionName = null;
 			try {
-				for (int i = 0, size = lines.size(); i < size; ++i) {
-					String line = lines.get(i);
+				for (int i = 0, size = lines.Count; i < size; ++i) {
+					string line = lines[i];
 					if (line.length() == 0 && sectionName != null) {
 						// Leave section
-						if (sectionName.equals("TimingPoints")) {
-							List<String> timingPointLines = keysoundingStrategy
+						if (sectionName == "TimingPoints") {
+							List<string> timingPointLines = keysoundingStrategy
 									.rewriteTimingPoints(timingPoints,
 											keysounds);
 
-							for (String timingPointLine : timingPointLines) {
+							foreach (string timingPointLine in timingPointLines) {
 								writer.append(timingPointLine);
 								writer.newLine();
 							}
@@ -149,22 +135,22 @@ public class KeysoundProcessor {
 						sectionName = null;
 					}
 
-					if (line.startsWith("[") && line.endsWith("]")) {
+					if (line.StartsWith("[") && line.EndsWith("]")) {
 						// Enter section
-						sectionName = line.substring(1, line.length() - 1);
+						sectionName = line.Substring(1, line.Length - 1);
 
 						writer.append(line);
 						writer.newLine();
 
-						if (sectionName.equals("HitObjects")) {
-							for (Keysound keysound : keysounds) {
+						if (sectionName == "HitObjects") {
+							foreach (Keysound keysound in keysounds) {
 								if (keysound.type != Keysound.Type.HITOBJECT)
 									continue;
 
-								String[] keysoundDataLines = keysound.data
+								string[] keysoundDataLines = keysound.data
 										.split("\n");
-								int volume = 133 / keysoundDataLines.length;
-								for (String keysoundData : keysoundDataLines) {
+								int volume = 133 / keysoundDataLines.Length;
+								for (string keysoundData : keysoundDataLines) {
 									writer.append(keysoundingStrategy
 											.rewriteKeysoundData(keysound,
 													keysoundData, volume));
@@ -175,13 +161,13 @@ public class KeysoundProcessor {
 
 					} else if (sectionName != null) {
 						// Inside a section
-						if (sectionName.equals("Events")) {
-							if (!line.startsWith("Sample")) {
+						if (sectionName == "Events") {
+							if (!line.StartsWith("Sample")) {
 								writer.append(line);
 								writer.newLine();
 
-								if (line.equals("//Storyboard Sound Samples")) {
-									for (Keysound keysound : keysounds) {
+								if (line == "//Storyboard Sound Samples") {
+									foreach (Keysound keysound in keysounds) {
 										if (keysound.type != Keysound.Type.AUTO)
 											continue;
 
@@ -193,8 +179,8 @@ public class KeysoundProcessor {
 								}
 							}
 
-						} else if (!sectionName.equals("HitObjects")
-								&& !sectionName.equals("TimingPoints")) {
+						} else if (sectionName != "HitObjects"
+								&& sectionName != "TimingPoints") {
 
 							writer.append(line);
 							writer.newLine();
@@ -216,10 +202,9 @@ public class KeysoundProcessor {
 		}
 	}
 
-	private List<String> retrieveLines(File file) throws FileNotFoundException,
-			IOException {
+	private List<string> retrieveLines(File file) {
 
-		List<String> lines = new ArrayList<String>();
+		List<string> lines = new List<string>();
 		FileInputStream is = new FileInputStream(file);
 		try {
 			InputStreamReader inputStreamReader = new InputStreamReader(is,
@@ -228,8 +213,8 @@ public class KeysoundProcessor {
 			try {
 				String line;
 				while ((line = reader.readLine()) != null) {
-					line = line.trim();
-					lines.add(line);
+					line = line.Trim();
+					lines.Add(line);
 				}
 
 			} finally {

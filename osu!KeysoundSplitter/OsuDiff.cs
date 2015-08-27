@@ -1,53 +1,44 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
+using System.Collections.Generic;
+using System.IO;
 namespace osuKeysoundSplitter
 {
 public class OsuDiff {
 
 	public class DiffEvent {
 		public long time;
-		public String data;
-		public boolean isHitObject;
+		public string data;
+		public bool isHitObject;
 
-		public boolean isLine() {
+		public bool isLine() {
 			return isHitObject && data == null;
 		}
 
-		public boolean isSplittingPoint() {
+		public bool isSplittingPoint() {
 			return !isHitObject && data == null;
 		}
 
-		@Override
-		public String toString() {
+		public override string toString() {
 			return time + " " + data;
 		}
 	}
 
-	public List<DiffEvent> diffEvents = new ArrayList<DiffEvent>();
-	public List<TimingPoint> timingPoints = new ArrayList<TimingPoint>();
+	public List<DiffEvent> diffEvents = new List<DiffEvent>();
+	public List<TimingPoint> timingPoints = new List<TimingPoint>();
 	private double sliderMultiplier;
 
-	public OsuDiff(File file) throws IOException {
+	public OsuDiff(File file) {
 		FileInputStream is = new FileInputStream(file);
 		try {
 			InputStreamReader inputStreamReader = new InputStreamReader(is,
 					Charset.forName("UTF-8"));
 			BufferedReader reader = new BufferedReader(inputStreamReader);
 
-			String line;
+			string line;
 			while ((line = reader.readLine()) != null) {
 				line = line.trim();
 				if (line.startsWith("[") && line.endsWith("]")) {
-					String sectionName = line.substring(1, line.length() - 1);
+					string sectionName = line.substring(1, line.length() - 1);
 
 					if (sectionName.equals("Editor")) {
 						parseOsuEditorSection(reader);

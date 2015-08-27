@@ -1,25 +1,14 @@
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-import com.damnae.osukeysoundsplitter.audio.decode.AudioDecoder;
-import com.damnae.osukeysoundsplitter.audio.decode.FlacAudioDecoder;
-import com.damnae.osukeysoundsplitter.audio.encode.AudioEncoder;
-import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
-import com.damnae.osukeysoundsplitter.strategy.StandardKeysoundingStrategy;
+using osuKeysoundSplitter.Audio.Encode;
+using osuKeysoundSplitter.Strategy;
+using System.IO;
 
 namespace osuKeysoundSplitter
 {
 public class MapsetProcessor {
 
-	private static final String KEYSOUND_TRACK_EXTENSION = ".flac";
-	private static final String DIFF_FILE_EXTENSION = ".osu";
+	private static const String KEYSOUND_TRACK_EXTENSION = ".flac";
+	private static const String DIFF_FILE_EXTENSION = ".osu";
 
 	private class DiffContext {
 		public KeysoundProcessor keysoundProcessor;
@@ -30,21 +19,21 @@ public class MapsetProcessor {
 	}
 
 	public void process(File folder, int offset, AudioEncoder audioEncoder)
-			throws IOException {
+			 {
 		long startTime = System.nanoTime();
 
 		System.out.println("Processing mapset in " + folder.getCanonicalPath());
 
 		File[] keysoundTrackFiles = folder.listFiles(new FilenameFilter() {
 			@Override
-			public boolean accept(File dir, String name) {
+			public bool accept(File dir, string name) {
 				return name.endsWith(KEYSOUND_TRACK_EXTENSION);
 			}
 		});
 
 		File[] diffFiles = folder.listFiles(new FilenameFilter() {
 			@Override
-			public boolean accept(File dir, String name) {
+			public bool accept(File dir, String name) {
 				return name.endsWith(DIFF_FILE_EXTENSION);
 			}
 		});

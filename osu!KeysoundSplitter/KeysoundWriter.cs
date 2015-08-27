@@ -1,17 +1,14 @@
-import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.ExecutorService;
 
-import com.damnae.osukeysoundsplitter.audio.AudioTrackInfo;
-import com.damnae.osukeysoundsplitter.audio.encode.AudioEncoder;
-import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
-import com.damnae.osukeysoundsplitter.strategy.KeysoundingStrategy;
+using osuKeysoundSplitter.Audio;
+using osuKeysoundSplitter.Audio.Encode;
+using osuKeysoundSplitter.PathProvider;
+using osuKeysoundSplitter.Strategy;
 
 namespace osuKeysoundSplitter
 {
 public class KeysoundWriter {
-	private static final int FADE_IN_DURATION = 2; // ms
-	private static final int FADE_OUT_DURATION = 2; // ms
+	private static const int FADE_IN_DURATION = 2; // ms
+	private static const int FADE_OUT_DURATION = 2; // ms
 
 	private KeysoundingStrategy keysoundingStrategy;
 	private ExecutorService executorService;
@@ -23,20 +20,20 @@ public class KeysoundWriter {
 		this.executorService = executorService;
 	}
 
-	public String writeKeysound(final byte[] data, final AudioTrackInfo info)
-			throws IOException {
+	public string writeKeysound(byte[] data, AudioTrackInfo info)
+			 {
 
-		final KeysoundPathProvider keysoundPathProvider = keysoundingStrategy
+		KeysoundPathProvider keysoundPathProvider = keysoundingStrategy
 				.getKeysoundPathProvider();
-		final AudioEncoder audioEncoder = keysoundingStrategy.getAudioEncoder();
+		AudioEncoder audioEncoder = keysoundingStrategy.getAudioEncoder();
 
 		fadeInOut(data, info);
 
-		String keysoundIdentifier = keysoundPathProvider.getIdentifier(data);
-		boolean isGenerated = keysoundPathProvider
+		string keysoundIdentifier = keysoundPathProvider.getIdentifier(data);
+		bool isGenerated = keysoundPathProvider
 				.isGenerated(keysoundIdentifier);
 
-		final String keysoundPath = keysoundPathProvider.getKeysoundPath(
+		string keysoundPath = keysoundPathProvider.getKeysoundPath(
 				keysoundIdentifier, audioEncoder.getExtension());
 
 		if (!isGenerated) {

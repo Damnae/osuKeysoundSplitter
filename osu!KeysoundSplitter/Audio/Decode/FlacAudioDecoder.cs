@@ -1,71 +1,52 @@
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.kc7bfi.jflac.FLACDecoder;
-import org.kc7bfi.jflac.PCMProcessor;
-import org.kc7bfi.jflac.metadata.StreamInfo;
-import org.kc7bfi.jflac.util.ByteData;
-
-import com.damnae.osukeysoundsplitter.audio.BaseAudioTrackInfo;
+using System.Collections.Generic;
+using System.IO;
 
 namespace osuKeysoundSplitter.Audio.Decode
 {
-public class FlacAudioDecoder implements AudioDecoder {
+public class FlacAudioDecoder : AudioDecoder {
 	private File audioFile;
-	private List<TrackProcessor> audioProcessors = new ArrayList<TrackProcessor>();
+	private List<TrackProcessor> audioProcessors = new List<TrackProcessor>();
 
 	public FlacAudioDecoder(File audioFile) {
 		this.audioFile = audioFile;
 	}
 
-	@Override
-	public void register(TrackProcessor audioProcessor) {
+	public override void register(TrackProcessor audioProcessor) {
 		if (audioProcessor == null)
 			throw new InvalidParameterException(
 					"audioProcessor must not be null");
 
-		audioProcessors.add(audioProcessor);
+		audioProcessors.Add(audioProcessor);
 	}
 
-	@Override
-	public void decode() throws IOException {
+	public override void decode() {
 		FileInputStream is = new FileInputStream(audioFile);
 		FLACDecoder decoder = new FLACDecoder(is);
-		for (final TrackProcessor trackProcessor : audioProcessors)
+		for (TrackProcessor trackProcessor : audioProcessors)
 			decoder.addPCMProcessor(new PCMProcessor() {
 
-				@Override
-				public void processStreamInfo(final StreamInfo info) {
+				public override void processStreamInfo(StreamInfo info) {
 					trackProcessor.processTrackInfo(new BaseAudioTrackInfo() {
 
-						@Override
-						public int getSampleRate() {
+						public override int getSampleRate() {
 							return info.getSampleRate();
 						}
 
-						@Override
-						public int getChannels() {
+						public override int getChannels() {
 							return info.getChannels();
 						}
 
-						@Override
-						public int getBitsPerSample() {
+						public override int getBitsPerSample() {
 							return info.getBitsPerSample();
 						}
 
-						@Override
-						public String toString() {
+						public override string toString() {
 							return info.toString();
 						}
 					});
 				}
 
-				@Override
-				public void processPCM(ByteData byteData) {
+				public override void processPCM(ByteData byteData) {
 					trackProcessor.processPCM(byteData.getData(),
 							byteData.getLen());
 				}

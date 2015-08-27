@@ -1,24 +1,16 @@
-import java.io.File;
-import java.util.List;
-
-import com.damnae.osukeysoundsplitter.Keysound;
-import com.damnae.osukeysoundsplitter.TimingPoint;
-import com.damnae.osukeysoundsplitter.audio.encode.AudioEncoder;
-import com.damnae.osukeysoundsplitter.pathprovider.KeysoundPathProvider;
+using osuKeysoundSplitter.Audio.Encode;
+using osuKeysoundSplitter.PathProvider;
+using System.Collections.Generic;
+using System.IO;
 
 namespace osuKeysoundSplitter.Strategy
 {
-public interface KeysoundingStrategy {
-	File getMapsetFolder();
-
-	AudioEncoder getAudioEncoder();
-
-	KeysoundPathProvider getKeysoundPathProvider();
-
-	String rewriteKeysoundData(Keysound keysound, String keysoundData,
-			int volume);
-
-	List<String> rewriteTimingPoints(List<TimingPoint> timingPoints,
-			List<Keysound> keysounds);
-}
+    public interface KeysoundingStrategy
+    {
+        File getMapsetFolder();
+        AudioEncoder getAudioEncoder();
+        KeysoundPathProvider getKeysoundPathProvider();
+        string rewriteKeysoundData(Keysound keysound, string keysoundData, int volume);
+        List<string> rewriteTimingPoints(List<TimingPoint> timingPoints, List<Keysound> keysounds);
+    }
 }

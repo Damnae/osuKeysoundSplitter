@@ -1,30 +1,31 @@
-import com.damnae.osukeysoundsplitter.KeysoundCache;
 
 namespace osuKeysoundSplitter.PathProvider
 {
-public class CounterKeysoundPathProvider extends BaseKeysoundPathProvider {
-	private String keysoundsFolderName;
-	private int fileIndex;
+    public class CounterKeysoundPathProvider : BaseKeysoundPathProvider
+    {
+        private string keysoundsFolderName;
+        private int fileIndex;
 
-	public CounterKeysoundPathProvider(KeysoundCache keysoundCache) {
-		super(keysoundCache);
-	}
+        public CounterKeysoundPathProvider(KeysoundCache keysoundCache)
+            : base(keysoundCache)
+        {
+        }
 
-	public CounterKeysoundPathProvider(KeysoundCache keysoundCache,
-			String keysoundsFolderName) {
+        public CounterKeysoundPathProvider(KeysoundCache keysoundCache,
+                string keysoundsFolderName)
+            : base(keysoundCache)
+        {
+            this.keysoundsFolderName = keysoundsFolderName;
+        }
 
-		super(keysoundCache);
-		this.keysoundsFolderName = keysoundsFolderName;
-	}
+        protected override string getNewKeysoundPath(string extension)
+        {
+            ++fileIndex;
 
-	@Override
-	protected String getNewKeysoundPath(String extension) {
-		++fileIndex;
+            if (keysoundsFolderName == null)
+                return fileIndex + "." + extension;
 
-		if (keysoundsFolderName == null)
-			return fileIndex + "." + extension;
-
-		return keysoundsFolderName + "/" + fileIndex + "." + extension;
-	}
-}
+            return keysoundsFolderName + "/" + fileIndex + "." + extension;
+        }
+    }
 }

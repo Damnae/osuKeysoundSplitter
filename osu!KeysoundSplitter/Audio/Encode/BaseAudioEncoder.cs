@@ -1,17 +1,11 @@
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
-import com.damnae.osukeysoundsplitter.audio.AudioTrackInfo;
-import com.damnae.osukeysoundsplitter.audio.BaseAudioTrackInfo;
-
+using System.IO;
 namespace osuKeysoundSplitter.Audio.Encode
 {
-public abstract class BaseAudioEncoder implements AudioEncoder {
+public abstract class BaseAudioEncoder : AudioEncoder {
 
-	@Override
-	public void encode(File toFile, byte[] data, AudioTrackInfo info)
-			throws IOException {
+	public override void encode(File toFile, byte[] data, AudioTrackInfo info)
+			 {
 
 		toFile.getParentFile().mkdirs();
 
@@ -24,22 +18,18 @@ public abstract class BaseAudioEncoder implements AudioEncoder {
 		}
 	}
 
-	@Override
-	public void encodeSilence(File toFile) throws IOException {
+	public override void encodeSilence(File toFile)  {
 		AudioTrackInfo info = new BaseAudioTrackInfo() {
 
-			@Override
-			public int getSampleRate() {
+			public override int getSampleRate() {
 				return 44100;
 			}
 
-			@Override
-			public int getChannels() {
+			public override int getChannels() {
 				return 2;
 			}
 
-			@Override
-			public int getBitsPerSample() {
+			public override int getBitsPerSample() {
 				return 16;
 			}
 		};

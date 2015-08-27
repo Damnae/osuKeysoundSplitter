@@ -1,12 +1,11 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace osuKeysoundSplitter
 {
 public class TimingPoint {
-	private static final int TIMING_POINT_LENIENCY = 5; //ms
+	private static const int TIMING_POINT_LENIENCY = 5; //ms
 	
 	public long time;
 	public double secondValue;
@@ -14,8 +13,8 @@ public class TimingPoint {
 	public int sampleType;
 	public int sampleSet;
 	public int volume;
-	public boolean isInherited;
-	public boolean isKiai;
+	public bool isInherited;
+	public bool isKiai;
 
 	public double prevousBeatDuration;
 
@@ -46,7 +45,7 @@ public class TimingPoint {
 		return 1;
 	}
 
-	public boolean isSimilar(TimingPoint previousTimingPoint) {
+	public bool isSimilar(TimingPoint previousTimingPoint) {
 		if (!isInherited && previousTimingPoint.isInherited
 				|| getBeatDuration() != previousTimingPoint.getBeatDuration()
 				|| getMultiplier() != previousTimingPoint.getMultiplier()
@@ -60,50 +59,49 @@ public class TimingPoint {
 		return true;
 	}
 
-	@Override
-	public String toString() {
+	public override string toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(time);
-		sb.append(",");
-		sb.append(secondValue);
-		sb.append(",");
-		sb.append(beatPerMeasure);
-		sb.append(",");
-		sb.append(sampleType);
-		sb.append(",");
-		sb.append(sampleSet);
-		sb.append(",");
-		sb.append(volume);
-		sb.append(",");
-		sb.append(isInherited ? 0 : 1);
-		sb.append(",");
-		sb.append(isKiai ? 1 : 0);
-		return sb.toString();
+		sb.Append(time);
+		sb.Append(",");
+		sb.Append(secondValue);
+		sb.Append(",");
+		sb.Append(beatPerMeasure);
+		sb.Append(",");
+		sb.Append(sampleType);
+		sb.Append(",");
+		sb.Append(sampleSet);
+		sb.Append(",");
+		sb.Append(volume);
+		sb.Append(",");
+		sb.Append(isInherited ? 0 : 1);
+		sb.Append(",");
+		sb.Append(isKiai ? 1 : 0);
+		return sb.ToString();
 	}
 
-	public static TimingPoint parseTimingPoint(String timingPointLine,
+	public static TimingPoint parseTimingPoint(string timingPointLine,
 			double previousNonInheritedBeatDuration) {
 
-		String[] values = timingPointLine.split(",");
+		string[] values = timingPointLine.Split(",");
 
-		if (values.length < 2)
-			throw new RuntimeException("Timing point has less than 2 values: "
+		if (values.Length < 2)
+			throw new Exception("Timing point has less than 2 values: "
 					+ timingPointLine);
 
 		TimingPoint timingPoint = new TimingPoint();
 		timingPoint.time = (long) Double.parseDouble(values[0]);
 		timingPoint.secondValue = Double.parseDouble(values[1]);
-		timingPoint.beatPerMeasure = values.length > 2 ? Integer
+		timingPoint.beatPerMeasure = values.Length > 2 ? Integer
 				.parseInt(values[2]) : 4;
-		timingPoint.sampleType = values.length > 3 ? Integer
+		timingPoint.sampleType = values.Length > 3 ? Integer
 				.parseInt(values[3]) : 1;
-		timingPoint.sampleSet = values.length > 4 ? Integer.parseInt(values[4])
+		timingPoint.sampleSet = values.Length > 4 ? Integer.parseInt(values[4])
 				: 1;
-		timingPoint.volume = values.length > 5 ? Integer.parseInt(values[5])
+		timingPoint.volume = values.Length > 5 ? Integer.parseInt(values[5])
 				: 100;
-		timingPoint.isInherited = values.length > 6 ? Integer
+		timingPoint.isInherited = values.Length > 6 ? Integer
 				.parseInt(values[6]) == 0 : false;
-		timingPoint.isKiai = values.length > 7 ? Integer.parseInt(values[7]) != 0
+		timingPoint.isKiai = values.Length > 7 ? Integer.parseInt(values[7]) != 0
 				: false;
 
 		if (timingPoint.isInherited)
@@ -112,14 +110,14 @@ public class TimingPoint {
 		return timingPoint;
 	}
 
-	public static List<String> buildTimingPointLines(
+	public static List<string> buildTimingPointLines(
 			List<TimingPoint> timingPoints) {
 
-		List<String> timingPointLines = new ArrayList<String>(
-				timingPoints.size());
+		List<String> timingPointLines = new List<string>(
+				timingPoints.Count);
 
-		for (TimingPoint timingPoint : timingPoints)
-			timingPointLines.add(timingPoint.toString());
+		foreach (TimingPoint timingPoint in timingPoints)
+			timingPointLines.Add(timingPoint.toString());
 
 		return timingPointLines;
 	}
@@ -128,13 +126,13 @@ public class TimingPoint {
 		TimingPoint previousTimingPoint = null;
 
 		int i = 0;
-		while (i < timingPoints.size()) {
-			TimingPoint timingPoint = timingPoints.get(i);
+		while (i < timingPoints.Count) {
+			TimingPoint timingPoint = timingPoints[i];
 			if (previousTimingPoint != null) {
 
 				if (timingPoint.isSimilar(previousTimingPoint)) {
 
-					timingPoints.remove(i);
+					timingPoints.RemoveAt(i);
 					continue;
 				}
 			}
@@ -146,11 +144,11 @@ public class TimingPoint {
 	public static TimingPoint getTimingPointAtTime(
 			List<TimingPoint> timingPoints, long time) {
 
-		if (timingPoints == null || timingPoints.size() == 0)
+		if (timingPoints == null || timingPoints.Count == 0)
 			return null;
 
-		TimingPoint currentTimingPoint = timingPoints.get(0);
-		for (TimingPoint timingsPoint : timingPoints) {
+		TimingPoint currentTimingPoint = timingPoints[0];
+		foreach (TimingPoint timingsPoint in timingPoints) {
 			if (timingsPoint.time - time <= TIMING_POINT_LENIENCY) {
 				currentTimingPoint = timingsPoint;
 
@@ -167,9 +165,9 @@ public class TimingPoint {
 
 		TimingPoint timingPoint = getTimingPointAtTime(timingPoints, time);
 
-		if (Math.abs(timingPoint.time - time) > TIMING_POINT_LENIENCY) {
+		if (Math.Abs(timingPoint.time - time) > TIMING_POINT_LENIENCY) {
 			timingPoint = timingPoint.createInherited(time);
-			timingPoints.add(timingPoint);
+			timingPoints.Add(timingPoint);
 		}
 		sortTimingPoints(timingPoints);
 
@@ -177,7 +175,7 @@ public class TimingPoint {
 	}
 
 	public static void sortTimingPoints(List<TimingPoint> timingPoints) {
-		Collections.sort(timingPoints, new Comparator<TimingPoint>() {
+        Collections.sort(timingPoints, new Comparator<TimingPoint>() {
 
 			@Override
 			public int compare(TimingPoint t1, TimingPoint t2) {

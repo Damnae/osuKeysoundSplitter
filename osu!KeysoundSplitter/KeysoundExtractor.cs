@@ -1,13 +1,7 @@
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.List;
-
-import com.damnae.osukeysoundsplitter.audio.AudioTrackInfo;
-import com.damnae.osukeysoundsplitter.audio.decode.TrackProcessor;
 
 namespace osuKeysoundSplitter
 {
-public class KeysoundExtractor implements TrackProcessor {
+public class KeysoundExtractor : TrackProcessor {
 	private List<Keysound> keysounds;
 	private KeysoundWriter keysoundWriter;
 	private int offset;

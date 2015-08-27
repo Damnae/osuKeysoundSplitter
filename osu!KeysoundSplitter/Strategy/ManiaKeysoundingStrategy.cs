@@ -1,40 +1,39 @@
-import java.io.File;
-
-import com.damnae.osukeysoundsplitter.Keysound;
-import com.damnae.osukeysoundsplitter.KeysoundCache;
-import com.damnae.osukeysoundsplitter.audio.encode.AudioEncoder;
-import com.damnae.osukeysoundsplitter.pathprovider.CounterKeysoundPathProvider;
+using osuKeysoundSplitter.Audio.Encode;
+using osuKeysoundSplitter.PathProvider;
+using System.IO;
 
 namespace osuKeysoundSplitter.Strategy
 {
-public class ManiaKeysoundingStrategy extends BaseKeysoundingStrategy {
+    public class ManiaKeysoundingStrategy : BaseKeysoundingStrategy
+    {
 
-	public ManiaKeysoundingStrategy(File mapsetFolder,
-			KeysoundCache keysoundCache, AudioEncoder audioEncoder) {
+        public ManiaKeysoundingStrategy(File mapsetFolder,
+                KeysoundCache keysoundCache, AudioEncoder audioEncoder)
+            : base(mapsetFolder, new CounterKeysoundPathProvider(keysoundCache),
+                audioEncoder)
+        {
+        }
 
-		super(mapsetFolder, new CounterKeysoundPathProvider(keysoundCache),
-				audioEncoder);
-	}
+        public ManiaKeysoundingStrategy(File mapsetFolder,
+                KeysoundCache keysoundCache, AudioEncoder audioEncoder,
+                string keysoundsFolderName)
+            : base(mapsetFolder, new CounterKeysoundPathProvider(keysoundCache,
+                keysoundsFolderName), audioEncoder)
+        {
+        }
 
-	public ManiaKeysoundingStrategy(File mapsetFolder,
-			KeysoundCache keysoundCache, AudioEncoder audioEncoder,
-			String keysoundsFolderName) {
+        public override string rewriteKeysoundData(Keysound keysound, string keysoundData,
+                int volume)
+        {
 
-		super(mapsetFolder, new CounterKeysoundPathProvider(keysoundCache,
-				keysoundsFolderName), audioEncoder);
-	}
+            int colonPos = keysoundData.LastIndexOf(":");
+            if (colonPos > -1)
+            {
+                keysoundData = keysoundData.Substring(0, colonPos) + ":"
+                        + keysound.filename;
+            }
 
-	@Override
-	public String rewriteKeysoundData(Keysound keysound, String keysoundData,
-			int volume) {
-
-		int colonPos = keysoundData.lastIndexOf(":");
-		if (colonPos > -1) {
-			keysoundData = keysoundData.substring(0, colonPos) + ":"
-					+ keysound.filename;
-		}
-
-		return keysoundData;
-	}
-}
+            return keysoundData;
+        }
+    }
 }
